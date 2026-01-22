@@ -16,7 +16,7 @@ router.post(
 router.patch(
   "/:id/assign-advisor",
   protect,
-  authorizeRoles("SERVICE_MANAGER"),
+  authorizeRoles("RECEPTIONIST"),
   assignAdvisor
 );
 
