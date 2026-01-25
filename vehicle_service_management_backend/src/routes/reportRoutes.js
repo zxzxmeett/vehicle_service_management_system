@@ -1,12 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const { createUser } = require("../controllers/userController");
+const { getDailyReport } = require("../controllers/reportController");
 const { protect } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
 
-//only ADMIN can create users
-
-router.post("/", protect, authorizeRoles("ADMIN"), createUser);
+router.get(
+  "/daily",
+  protect,
+  authorizeRoles("ADMIN"),
+  getDailyReport
+);
 
 module.exports = router;

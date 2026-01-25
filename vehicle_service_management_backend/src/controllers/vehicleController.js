@@ -1,8 +1,33 @@
 const VehicleEntry = require("../models/VehicleEntry");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
+const { calculateTimes } = require("../utils/timeCalculator");
 
-exports.assignAdvisor = async (req, res) => {
+exports.checkInVehicle = asyncHandler(async (req, res) => {
+  const { customerName, phone, vehicleNumber, vehicleModel } = req.body;
+
+  if (!customerName || !phone || !vehicleNumber) {
+    res.status(400);
+    throw new Error("Required fields are missing");
+  }
+
+  const vehicle = await VehicleEntry.create({
+    customerName,
+    phone,
+    vehicleNumber,
+    vehicleModel,
+    currentStatus: "CHECKED_IN",
+    statusHistory: [
+      {
+        status: "CHECKED_IN",
+      },
+    ],
+  });
+
+  res.status(201).json(vehicle);
+});
+
+exports.assignAdvisor = asyncHandler(async (req, res) => {
   const { advisorId } = req.body;
   const vehicleId = req.params.id;
 
@@ -35,28 +60,82 @@ exports.assignAdvisor = async (req, res) => {
   await vehicle.save();
 
   res.json(vehicle);
-};
+});
 
-exports.checkInVehicle = asyncHandler(async (req, res) => {
-  const { customerName, phone, vehicleNumber, vehicleModel } = req.body;
+exports.updateVehicleStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  const vehicleId = req.params.id;
 
-  if (!customerName || !phone || !vehicleNumber) {
+  const allowedStatuses = [
+    "IN_SERVICE",
+    "QC_PENDING",
+    "READY_FOR_DELIVERY",
+    "DELIVERED",
+  ];
+
+  if (!status || !allowedStatuses.includes(status)) {
     res.status(400);
-    throw new Error("Required fields are missing");
+    throw new Error("Invalid or missing status");
   }
 
-  const vehicle = await VehicleEntry.create({
-    customerName,
-    phone,
-    vehicleNumber,
-    vehicleModel,
-    currentStatus: "CHECKED_IN",
-    statusHistory: [
-      {
-        status: "CHECKED_IN",
-      },
-    ],
+  const vehicle = await VehicleEntry.findById(vehicleId);
+  if (!vehicle) {
+    res.status(404);
+    throw new Error("Vehicle entry not found");
+  }
+
+  // Optional: enforce correct order (simple version)
+  vehicle.currentStatus = status;
+  vehicle.statusHistory.push({ status });
+
+  if (status === "DELIVERED") {
+    vehicle.deliveryTime = new Date();
+  }
+
+  await vehicle.save();
+
+  res.json(vehicle);
+});
+
+exports.getVehicleTimes = asyncHandler(async (req, res) => {
+  const vehicle = await VehicleEntry.findById(req.params.id);
+
+  if (!vehicle) {
+    res.status(404);
+    throw new Error("Vehicle not found");
+  }
+
+  const times = calculateTimes(vehicle.statusHistory);
+
+  res.json({
+    vehicleId: vehicle._id,
+    currentStatus: vehicle.currentStatus,
+    ...times,
+  });
+});
+
+exports.addJob = asyncHandler(async (req, res) => {
+  const { description, estimatedTimeInMinutes } = req.body;
+  const vehicleId = req.params.id;
+
+  if (!description) {
+    res.status(400);
+    throw new Error("Job description required");
+  }
+
+  const vehicle = await VehicleEntry.findById(vehicleId);
+  if (!vehicle) {
+    res.status(404);
+    throw new Error("Vehicle not found");
+  }
+
+  vehicle.jobs.push({
+    description,
+    estimatedTimeInMinutes,
+    file: req.file ? req.file.path : null,
   });
 
-  res.status(201).json(vehicle);
+  await vehicle.save();
+
+  res.status(201).json(vehicle.jobs);
 });

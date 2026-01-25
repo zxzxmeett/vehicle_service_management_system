@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const { assignAdvisor} = require("../controllers/vehicleController");
-const { checkInVehicle } = require("../controllers/vehicleController");
+const { checkInVehicle,assignAdvisor,updateVehicleStatus,getVehicleTimes,addJob } = require("../controllers/vehicleController");
 const { protect } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
+const upload = require("../middleware/uploadMiddleware");
 
 router.post(
   "/checkin",
@@ -13,11 +13,35 @@ router.post(
   checkInVehicle
 );
 
+// :id refers to vehicle entry ID
 router.patch(
   "/:id/assign-advisor",
   protect,
   authorizeRoles("RECEPTIONIST"),
   assignAdvisor
 );
+
+router.patch(
+  "/:id/update-status",
+  protect,
+  authorizeRoles("ADVISOR"),
+  updateVehicleStatus
+);
+
+router.get(
+  "/:id/times",
+  protect,
+  authorizeRoles("ADMIN", "RECEPTIONIST", "ADVISOR"),
+  getVehicleTimes
+);
+
+router.post(
+  "/:id/jobs",
+  protect,
+  authorizeRoles("ADVISOR"),
+  upload.single("jobFile"),
+  addJob
+);
+
 
 module.exports = router;

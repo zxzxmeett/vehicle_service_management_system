@@ -9,6 +9,9 @@ const jobSchema = new mongoose.Schema(
     estimatedTimeInMinutes: {
       type: Number,
     },
+    file: {
+      type: String, // path to uploaded file
+    },
     addedAt: {
       type: Date,
       default: Date.now,
@@ -16,7 +19,6 @@ const jobSchema = new mongoose.Schema(
   },
   { _id: false }
 );
-
 const statusHistorySchema = new mongoose.Schema(
   {
     status: {

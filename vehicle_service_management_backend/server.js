@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./src/config/db");
+const reportRoutes = require("./src/routes/reportRoutes");
 
 dotenv.config();
 connectDB();
@@ -9,6 +10,9 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/reports", reportRoutes);
 
 app.get("/", (req, res) => {
   res.send("Vehicle Service Management API running");
