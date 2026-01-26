@@ -5,7 +5,7 @@ const User = require("../models/User");
 //make sure the user is authenticated and JWT is valid
 
 const protect = async (req, res, next) => {
-  let token;
+  let token;  
 
   //reading token from header
   if (

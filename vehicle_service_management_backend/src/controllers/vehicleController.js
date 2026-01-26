@@ -139,3 +139,25 @@ exports.addJob = asyncHandler(async (req, res) => {
 
   res.status(201).json(vehicle.jobs);
 });
+
+
+// for receptionist and admin to filter vehicles by status
+exports.getVehiclesByStatus = async (req, res) => {
+  const { status } = req.query;
+
+  if (!status) {
+    return res.status(400).json({ message: "Status is required" });
+  }
+
+  const vehicles = await VehicleEntry.find({ currentStatus: status });
+  res.json(vehicles);
+};
+
+// for advisor to get assigned vehicles
+exports.getAssignedVehicles = async (req, res) => {
+  const vehicles = await VehicleEntry.find({
+    assignedAdvisor: req.user._id,
+  });
+
+  res.json(vehicles);
+};

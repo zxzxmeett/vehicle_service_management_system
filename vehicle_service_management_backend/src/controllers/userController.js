@@ -32,3 +32,13 @@ exports.createUser = asyncHandler(async (req, res) => {
     role: user.role,
   });
 });
+exports.getUsersByRole = async (req, res) => {
+  const { role } = req.query;
+
+  if (!role) {
+    return res.status(400).json({ message: "Role is required" });
+  }
+
+  const users = await User.find({ role }).select("-password");
+  res.json(users);
+};

@@ -5,6 +5,8 @@ const { checkInVehicle,assignAdvisor,updateVehicleStatus,getVehicleTimes,addJob 
 const { protect } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
 const upload = require("../middleware/uploadMiddleware");
+const { getVehiclesByStatus } = require("../controllers/vehicleController");
+const { getAssignedVehicles } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -42,5 +44,20 @@ router.post(
   upload.single("jobFile"),
   addJob
 );
+
+router.get(
+  "/",
+  protect,
+  authorizeRoles("RECEPTIONIST", "ADMIN"),
+  getVehiclesByStatus
+);
+
+router.get(
+  "/assigned",
+  protect,
+  authorizeRoles("ADVISOR"),
+  getAssignedVehicles
+);
+
 
 module.exports = router;
