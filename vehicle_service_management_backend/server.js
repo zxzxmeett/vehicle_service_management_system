@@ -25,6 +25,7 @@ const vehicleRoutes = require("./src/routes/vehicleRoutes");
 const { errorHandler } = require("./src/middleware/errorMiddleware");
 app.use(errorHandler);
 
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

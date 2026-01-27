@@ -17,7 +17,7 @@ function Reception() {
     } catch (err) {
       setError("Failed to fetch vehicles");
     }
-  };    
+  };
 
   // Fetch advisors
   const fetchAdvisors = async () => {
@@ -54,33 +54,37 @@ function Reception() {
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>Reception Dashboard</h1>
-      <LogoutButton />
+    <div className="container">
+      <div className="header">
+        <h1>Reception Dashboard</h1>
+        <LogoutButton />
+      </div>
 
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p className="msg-success">{message}</p>}
+      {error && <p className="msg-error">{error}</p>}
 
       <h3>Assign Advisor</h3>
 
-      <select
-        value={selectedAdvisor}
-        onChange={(e) => setSelectedAdvisor(e.target.value)}
-      >
-        <option value="">Select Advisor</option>
-        {advisors.map((advisor) => (
-          <option key={advisor._id} value={advisor._id}>
-            {advisor.name}
-          </option>
-        ))}
-      </select>
+      <div className="card flex-row">
+        <select
+          value={selectedAdvisor}
+          onChange={(e) => setSelectedAdvisor(e.target.value)}
+        >
+          <option value="">Select Advisor</option>
+          {advisors.map((advisor) => (
+            <option key={advisor._id} value={advisor._id}>
+              {advisor.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <ul>
+      <ul className="list-reset">
         {vehicles.map((vehicle) => (
-          <li key={vehicle._id} style={{ marginTop: "10px" }}>
+          <li key={vehicle._id} className="mt-1">
             <b>{vehicle.vehicleNumber}</b> — {vehicle.vehicleModel}
             <button
-              style={{ marginLeft: "10px" }}
+              className="btn ml-1"
               onClick={() => assignAdvisor(vehicle._id)}
             >
               Assign

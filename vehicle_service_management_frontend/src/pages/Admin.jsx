@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import LogoutButton from "../components/LogoutButton";
 
 function Admin() {
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "",
-  });
-  const [userMessage, setUserMessage] = useState("");
+  const navigate = useNavigate();
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
+  const [jobsMap, setJobsMap] = useState({});
 
+  // fetch daily report
   const fetchDailyReport = async () => {
     try {
       const res = await api.get("/reports/daily");
@@ -26,120 +23,100 @@ function Admin() {
     fetchDailyReport();
   }, []);
 
-  const handleUserChange = (e) => {
-    setUserData({
-      ...userData,
-      [e.target.name]: e.target.value,
-    });
-  };
-//create new user
-  const createUser = async (e) => {
-    e.preventDefault();
-    setUserMessage("");
-    setError("");
-
+  // fetch jobs for a vehicle
+  const fetchJobs = async (vehicleId) => {
     try {
-      await api.post("/users", userData);
-      setUserMessage("User created successfully");
-
-      setUserData({
-        name: "",
-        email: "",
-        password: "",
-        role: "",
-      });
-    } catch (err) {
-      setError(err.response?.data?.message || "User creation failed");
+      const res = await api.get(`/vehicles/${vehicleId}/jobs`);
+      setJobsMap((prev) => ({
+        ...prev,
+        [vehicleId]: res.data,
+      }));
+    } catch {
+      setError("Failed to load jobs");
     }
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>Admin Dashboard</h1>
+    <div className="container">
+      <div className="header">
+        <h1>Admin Dashboard</h1>
+        <div>
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate("/admin/create-user")}
+          >
+            Create New User
+          </button>
+        </div>
+      </div>
+
       <LogoutButton />
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="msg-error">{error}</p>}
 
       {!report && !error && <p>Loading report...</p>}
 
-      <hr />
-
-      <h3>Create New User</h3>
-
-      {userMessage && <p className="success">{userMessage}</p>}
-
-      <form onSubmit={createUser} className="card">
-        <input
-          name="name"
-          placeholder="Name"
-          value={userData.name}
-          onChange={handleUserChange}
-          required
-        />
-
-        <input
-          name="email"
-          placeholder="Email"
-          value={userData.email}
-          onChange={handleUserChange}
-          required
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={userData.password}
-          onChange={handleUserChange}
-          required
-        />
-
-        <select
-          name="role"
-          value={userData.role}
-          onChange={handleUserChange}
-          required
-        >
-          <option value="">Select Role</option>
-          <option value="SECURITY">Security</option>
-          <option value="RECEPTIONIST">Receptionist</option>
-          <option value="ADVISOR">Advisor</option>
-        </select>
-
-        <button type="submit">Create User</button>
-      </form>
-
-      <hr />
+      <h2>Daily Report</h2>
 
       {report && (
         <>
           <h3>Date: {report.date}</h3>
           <h4>Total Vehicles Today: {report.totalVehicles}</h4>
 
-          <table
-            border="1"
-            cellPadding="10"
-            style={{ marginTop: "20px", borderCollapse: "collapse" }}
-          >
-            <thead>
-              <tr>
-                <th>Vehicle Number</th>
-                <th>Status</th>
-                <th>Service Time (min)</th>
-                <th>Idle Time (min)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {report.vehicles.map((vehicle) => (
-                <tr key={vehicle.vehicleId}>
-                  <td>{vehicle.vehicleNumber}</td>
-                  <td>{vehicle.currentStatus}</td>
-                  <td>{vehicle.serviceTimeInMinutes}</td>
-                  <td>{vehicle.idleTimeInMinutes}</td>
+          <div className="card">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Vehicle Number</th>
+                  <th>Status</th>
+                  <th>Service Time (min)</th>
+                  <th>Idle Time (min)</th>
+                  <th>Jobs</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {report.vehicles.map((vehicle) => (
+                  <tr key={vehicle.vehicleId}>
+                    <td>{vehicle.vehicleNumber}</td>
+                    <td>{vehicle.currentStatus}</td>
+                    <td>{vehicle.serviceTimeInMinutes}</td>
+                    <td>{vehicle.idleTimeInMinutes}</td>
+                    <td>
+                      <button
+                        className="btn"
+                        onClick={() => fetchJobs(vehicle.vehicleId)}
+                      >
+                        View Jobs
+                      </button>
+
+                      {jobsMap[vehicle.vehicleId]?.length > 0 && (
+                        <div className="muted mt-1">
+                          {jobsMap[vehicle.vehicleId].map((job, i) => (
+                            <div key={i}>
+                              <b>{job.description}</b>
+                              {job.file && (
+                                <>
+                                  {" "}
+                                  —{" "}
+                                  <a
+                                    href={`http://localhost:5000/${job.file}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    View Card
+                                  </a>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
     </div>

@@ -7,6 +7,7 @@ const { authorizeRoles } = require("../middleware/roleMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 const { getVehiclesByStatus } = require("../controllers/vehicleController");
 const { getAssignedVehicles } = require("../controllers/vehicleController");
+const { getVehicleJobs } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -59,5 +60,11 @@ router.get(
   getAssignedVehicles
 );
 
+router.get(
+  "/:id/jobs",
+  protect,
+  authorizeRoles("ADMIN"),
+  getVehicleJobs
+);
 
 module.exports = router;

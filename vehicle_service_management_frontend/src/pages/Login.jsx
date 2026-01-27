@@ -30,13 +30,14 @@ function Login() {
       const token = res.data.token;
       const role = res.data.role;
 
-      //store token and role in localStorage  
+      //store token and role in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
 
       if (role === "ADMIN") navigate("/admin", { replace: true });
       else if (role === "SECURITY") navigate("/security", { replace: true });
-      else if (role === "RECEPTIONIST") navigate("/reception", { replace: true });
+      else if (role === "RECEPTIONIST")
+        navigate("/reception", { replace: true });
       else if (role === "ADVISOR") navigate("/advisor", { replace: true });
       else console.error("Unknown role:", role);
     } catch (err) {
@@ -45,30 +46,47 @@ function Login() {
   };
 
   return (
-    <div style={{ padding: "40px" }}>
-      <h2>Login</h2>
+    <div className="container">
+      <div className="header">
+        <h2>
+          <svg
+            className="logo-icon"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M3 11.5C3 10.7 3.7 10 4.5 10h15c.8 0 1.5.7 1.5 1.5v3c0 .8-.7 1.5-1.5 1.5H20v1.25c0 .414-.336.75-.75.75h-1.5c-.414 0-.75-.336-.75-.75V16H8v1.25c0 .414-.336.75-.75.75H5.75c-.414 0-.75-.336-.75-.75V16H4.5C3.7 16 3 15.3 3 14.5v-3zM5.5 12.5c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1zm12 0c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1zM6.5 8.5l1.5-2.5h8l1.5 2.5h-11z" />
+          </svg>
+          Vehicle Service
+        </h2>
+      </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="msg-error">{error}</p>}
 
-      <form onSubmit={handleSubmit}>
+      <form className="card form" onSubmit={handleSubmit}>
+        <input
+          name="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
         <div>
-          <input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <button className="btn btn-primary" type="submit">
+            Login
+          </button>
         </div>
-
-        <div>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-
-        <button type="submit">Login</button>
       </form>
     </div>
   );

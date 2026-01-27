@@ -32,6 +32,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     role: user.role,
   });
 });
+
 exports.getUsersByRole = async (req, res) => {
   const { role } = req.query;
 

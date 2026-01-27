@@ -16,6 +16,7 @@ function Security() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
+      // e.target.name is the name attribute of the input field
       [e.target.name]: e.target.value,
     });
   };
@@ -41,16 +42,18 @@ function Security() {
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>Security Dashboard</h1>
-      <LogoutButton />
+    <div className="container">
+      <div className="header">
+        <h1>Security Dashboard</h1>
+        <LogoutButton />
+      </div>
 
       <h3>Vehicle Check-In</h3>
 
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p className="msg-success">{message}</p>}
+      {error && <p className="msg-error">{error}</p>}
 
-      <form onSubmit={handleSubmit}>
+      <form className="card form" onSubmit={handleSubmit}>
         <input
           name="customerName"
           placeholder="Customer Name"
@@ -58,7 +61,6 @@ function Security() {
           onChange={handleChange}
           required
         />
-        <br />
 
         <input
           name="phone"
@@ -67,7 +69,6 @@ function Security() {
           onChange={handleChange}
           required
         />
-        <br />
 
         <input
           name="vehicleNumber"
@@ -76,7 +77,6 @@ function Security() {
           onChange={handleChange}
           required
         />
-        <br />
 
         <input
           name="vehicleModel"
@@ -85,9 +85,12 @@ function Security() {
           onChange={handleChange}
           required
         />
-        <br /><br />
 
-        <button type="submit">Check In Vehicle</button>
+        <div>
+          <button className="btn btn-primary" type="submit">
+            Check In Vehicle
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -6,7 +6,7 @@ const { calculateTimes } = require("../utils/timeCalculator");
 exports.checkInVehicle = asyncHandler(async (req, res) => {
   const { customerName, phone, vehicleNumber, vehicleModel } = req.body;
 
-  if (!customerName || !phone || !vehicleNumber) {
+  if (!customerName || !phone || !vehicleNumber || !vehicleModel) {
     res.status(400);
     throw new Error("Required fields are missing");
   }
@@ -28,6 +28,7 @@ exports.checkInVehicle = asyncHandler(async (req, res) => {
 });
 
 exports.assignAdvisor = asyncHandler(async (req, res) => {
+  //user don't type advisor id directly, select from list 
   const { advisorId } = req.body;
   const vehicleId = req.params.id;
 
@@ -140,7 +141,6 @@ exports.addJob = asyncHandler(async (req, res) => {
   res.status(201).json(vehicle.jobs);
 });
 
-
 // for receptionist and admin to filter vehicles by status
 exports.getVehiclesByStatus = async (req, res) => {
   const { status } = req.query;
@@ -161,3 +161,14 @@ exports.getAssignedVehicles = async (req, res) => {
 
   res.json(vehicles);
 };
+
+// to get jobs of a vehicle
+exports.getVehicleJobs = async (req, res) => {
+  const vehicle = await VehicleEntry.findById(req.params.id).select("jobs");
+
+  if (!vehicle) {
+    return res.status(404).json({ message: "Vehicle not found" });
+  }
+
+  res.json(vehicle.jobs);
+}; 

@@ -1,3 +1,4 @@
+// Middleware to authorize based on user roles
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {

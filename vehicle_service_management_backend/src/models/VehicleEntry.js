@@ -42,6 +42,7 @@ const statusHistorySchema = new mongoose.Schema(
   { _id: false }
 );
 
+// jobSchema and statusHistorySchema are sub-schemas used within vehicleEntrySchema
 const vehicleEntrySchema = new mongoose.Schema(
   {
     customerName: {
@@ -73,7 +74,7 @@ const vehicleEntrySchema = new mongoose.Schema(
       ],
       default: "CHECKED_IN",
     },
-
+    //here
     statusHistory: [
       statusHistorySchema
     ],
@@ -82,7 +83,7 @@ const vehicleEntrySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-
+    //here
     jobs: [
       jobSchema
     ],
