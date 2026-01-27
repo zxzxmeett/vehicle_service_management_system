@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
 function LogoutButton() {
   const navigate = useNavigate();
@@ -10,9 +11,12 @@ function LogoutButton() {
   };
 
   return (
-    <button className="btn logout" onClick={handleLogout}>
-      Logout
-    </button>
+    <div className="flex-row">
+      <ThemeToggle />
+      <button className="btn logout" onClick={handleLogout}>
+        Logout
+      </button>
+    </div>
   );
 }
 
