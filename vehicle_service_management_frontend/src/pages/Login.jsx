@@ -36,8 +36,7 @@ function Login() {
 
       if (role === "ADMIN") navigate("/admin", { replace: true });
       else if (role === "SECURITY") navigate("/security", { replace: true });
-      else if (role === "RECEPTIONIST")
-        navigate("/reception", { replace: true });
+      else if (role === "RECEPTIONIST") navigate("/reception", { replace: true });
       else if (role === "ADVISOR") navigate("/advisor", { replace: true });
       else console.error("Unknown role:", role);
     } catch (err) {

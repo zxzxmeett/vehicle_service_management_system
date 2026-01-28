@@ -34,6 +34,7 @@ exports.createUser = asyncHandler(async (req, res) => {
 });
 
 exports.getUsersByRole = async (req, res) => {
+  //query means /users?role=RECEPTIONIST
   const { role } = req.query;
 
   if (!role) {

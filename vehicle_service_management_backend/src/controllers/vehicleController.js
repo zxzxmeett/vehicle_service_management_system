@@ -28,7 +28,7 @@ exports.checkInVehicle = asyncHandler(async (req, res) => {
 });
 
 exports.assignAdvisor = asyncHandler(async (req, res) => {
-  //user don't type advisor id directly, select from list 
+  //user don't type advisor id directly in body, they select from list and id extracted via frontend
   const { advisorId } = req.body;
   const vehicleId = req.params.id;
 

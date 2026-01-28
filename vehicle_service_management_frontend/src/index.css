@@ -1,5 +1,6 @@
 :root {
   --accent: #2563eb;
+  --text: #1f2937;
   --bg: #ffffff;
   --muted: #6b7280;
   --border: #e6e9ee;
@@ -9,7 +10,7 @@
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  color: #1f2937;
+  color: var(--text);
   background-color: var(--bg);
 }
 
@@ -22,7 +23,8 @@
   --accent: #60a5fa;
   --success: #68d391;
   --danger: #f56565;
-  color: #e6eef6;
+  --text: #e6eef6;
+  color: var(--text);
   background-color: var(--bg);
 }
 
@@ -32,7 +34,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: var(--bg);
-  color: #12202b;
+  color: var(--text);
 }
 
 .container {
@@ -71,7 +73,7 @@ input, select, textarea {
   border-radius: 6px;
   font-size: 1rem;
   color: inherit;
-  background: #fff;
+  background: var(--surface);
 }
 
 label { font-weight: 600; color: var(--muted); }
@@ -83,7 +85,7 @@ label { font-weight: 600; color: var(--muted); }
   border: 1px solid transparent;
   font-weight: 600;
   cursor: pointer;
-  background: #f3f4f6;
+  background: var(--surface);
   color: inherit;
 }
 
@@ -110,7 +112,7 @@ label { font-weight: 600; color: var(--muted); }
 .table th, .table td {
   text-align: left;
   padding: 0.7rem 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 /* Small utilities */
