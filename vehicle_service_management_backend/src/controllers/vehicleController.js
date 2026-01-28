@@ -142,16 +142,26 @@ exports.addJob = asyncHandler(async (req, res) => {
 });
 
 // for receptionist and admin to filter vehicles by status
-exports.getVehiclesByStatus = async (req, res) => {
-  const { status } = req.query;
+exports.getVehiclesByStatus = asyncHandler(async (req, res) => {
+  const { status, isReceptionCompleted } = req.query;
 
   if (!status) {
-    return res.status(400).json({ message: "Status is required" });
+    res.status(400);
+    throw new Error("Status is required");
   }
 
-  const vehicles = await VehicleEntry.find({ currentStatus: status });
+  const filter = {
+    currentStatus: status,
+  };
+
+  // IMPORTANT: handle boolean query param properly
+  if (isReceptionCompleted !== undefined) {
+    filter.isReceptionCompleted = isReceptionCompleted === "true";
+  }
+
+  const vehicles = await VehicleEntry.find(filter);
   res.json(vehicles);
-};
+});
 
 // for advisor to get assigned vehicles
 exports.getAssignedVehicles = async (req, res) => {
@@ -172,3 +182,18 @@ exports.getVehicleJobs = async (req, res) => {
 
   res.json(vehicle.jobs);
 }; 
+
+//Reception approval
+exports.markReceptionDone = async (req, res) => {
+  const { id } = req.params;
+
+  const vehicle = await VehicleEntry.findById(id);
+  if (!vehicle) {
+    return res.status(404).json({ message: "Vehicle not found" });
+  }
+
+  vehicle.isReceptionCompleted = true;
+  await vehicle.save();
+
+  res.json({ message: "Vehicle marked as completed" });
+};

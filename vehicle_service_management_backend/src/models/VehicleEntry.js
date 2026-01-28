@@ -17,7 +17,7 @@ const jobSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 const statusHistorySchema = new mongoose.Schema(
   {
@@ -39,7 +39,7 @@ const statusHistorySchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // jobSchema and statusHistorySchema are sub-schemas used within vehicleEntrySchema
@@ -75,18 +75,14 @@ const vehicleEntrySchema = new mongoose.Schema(
       default: "CHECKED_IN",
     },
     //here
-    statusHistory: [
-      statusHistorySchema
-    ],
+    statusHistory: [statusHistorySchema],
 
     assignedAdvisor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
     //here
-    jobs: [
-      jobSchema
-    ],
+    jobs: [jobSchema],
 
     checkInTime: {
       type: Date,
@@ -96,8 +92,12 @@ const vehicleEntrySchema = new mongoose.Schema(
     deliveryTime: {
       type: Date,
     },
+    isReceptionCompleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("VehicleEntry", vehicleEntrySchema);

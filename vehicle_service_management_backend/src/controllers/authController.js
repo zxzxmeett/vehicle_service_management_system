@@ -23,6 +23,14 @@ exports.loginUser = asyncHandler(async (req, res) => {
 
   const isMatch = await bcrypt.compare(password, user.password);
 
+  //check if bloked and give login access respectively
+
+  if (!user.isActive) {
+    return res.status(403).json({
+      message: "Your account has been deactivated. Contact admin.",
+    });
+  }
+
   if (!isMatch) {
     res.status(401);
     throw new Error("Invalid credentials");

@@ -8,6 +8,7 @@ const upload = require("../middleware/uploadMiddleware");
 const { getVehiclesByStatus } = require("../controllers/vehicleController");
 const { getAssignedVehicles } = require("../controllers/vehicleController");
 const { getVehicleJobs } = require("../controllers/vehicleController");
+const { markReceptionDone } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -65,6 +66,13 @@ router.get(
   protect,
   authorizeRoles("ADMIN"),
   getVehicleJobs
+);
+
+router.patch(
+  "/:id/reception-done",
+  protect,
+  authorizeRoles("RECEPTIONIST"),
+  markReceptionDone
 );
 
 module.exports = router;

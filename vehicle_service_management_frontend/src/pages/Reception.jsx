@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import LogoutButton from "../components/LogoutButton";
+import { useNavigate } from "react-router-dom";
 
 function Reception() {
   const [vehicles, setVehicles] = useState([]);
@@ -8,6 +9,7 @@ function Reception() {
   const [selectedAdvisor, setSelectedAdvisor] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   // Fetch checked-in vehicles
   const fetchVehicles = async () => {
@@ -92,6 +94,12 @@ function Reception() {
           </li>
         ))}
       </ul>
+      <button
+        className="btn btn-secondary"
+        onClick={() => navigate("/reception/delivery")}
+      >
+        Go to Delivery
+      </button>
     </div>
   );
 }

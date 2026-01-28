@@ -6,6 +6,7 @@ import Reception from "./pages/Reception.jsx";
 import Advisor from "./pages/Advisor.jsx";
 import ProtectedRoute from "./utlis/ProtectedRoute.jsx";
 import CreateUser from "./pages/createUser.jsx";  
+import ReceptionDelivery from "./pages/ReceptionDelivery.jsx";
 
 function App() {
   console.log("API URL:", import.meta.env.VITE_API_URL);
@@ -19,6 +20,7 @@ function App() {
         <Route path="/reception" element={<ProtectedRoute allowedRoles={["RECEPTIONIST"]}><Reception /></ProtectedRoute>} />
         <Route path="/advisor" element={<ProtectedRoute allowedRoles={["ADVISOR"]}><Advisor /></ProtectedRoute>} />
         <Route path="/admin/create-user" element={<ProtectedRoute allowedRoles={["ADMIN"]}><CreateUser /></ProtectedRoute>} />
+        <Route path="/reception/delivery" element={<ReceptionDelivery />} />
       </Routes>
     </BrowserRouter>
   );
