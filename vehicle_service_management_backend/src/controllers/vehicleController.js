@@ -4,7 +4,7 @@ const User = require("../models/User");
 const { calculateTimes } = require("../utils/timeCalculator");
 
 exports.checkInVehicle = asyncHandler(async (req, res) => {
-  const { customerName, phone, vehicleNumber, vehicleModel } = req.body;
+  const { customerName, phone, vehicleNumber, vehicleModel, checkInTime } = req.body;
 
   if (!customerName || !phone || !vehicleNumber || !vehicleModel) {
     res.status(400);
@@ -16,6 +16,7 @@ exports.checkInVehicle = asyncHandler(async (req, res) => {
     phone,
     vehicleNumber,
     vehicleModel,
+    checkInTime: checkInTime || undefined,
     currentStatus: "CHECKED_IN",
     statusHistory: [
       {

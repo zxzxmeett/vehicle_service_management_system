@@ -10,6 +10,13 @@ function Security() {
     vehicleModel: "",
   });
 
+  const [checkInTime, setCheckInTime] = useState(() => {
+    // default to current datetime in local format
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  });
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -27,7 +34,11 @@ function Security() {
     setMessage("");
 
     try {
-      await api.post("/vehicles/checkin", formData);
+      await api.post("/vehicles/checkin", {
+        ...formData,
+        checkInTime,
+      });
+
       setMessage("Vehicle checked in successfully");
 
       setFormData({
@@ -36,6 +47,10 @@ function Security() {
         vehicleNumber: "",
         vehicleModel: "",
       });
+
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      setCheckInTime(now.toISOString().slice(0, 16));
     } catch (err) {
       setError(err.response?.data?.message || "Check-in failed");
     }
@@ -54,6 +69,7 @@ function Security() {
       {error && <p className="msg-error">{error}</p>}
 
       <form className="card form" onSubmit={handleSubmit}>
+        <p id="customer-name-label">Customer name :</p>
         <input
           name="customerName"
           placeholder="Customer Name"
@@ -61,7 +77,7 @@ function Security() {
           onChange={handleChange}
           required
         />
-
+        <p>Phone number :</p>
         <input
           name="phone"
           placeholder="Phone Number"
@@ -69,7 +85,7 @@ function Security() {
           onChange={handleChange}
           required
         />
-
+        <p>Vehicle details :</p>
         <input
           name="vehicleNumber"
           placeholder="Vehicle Number"
@@ -77,13 +93,20 @@ function Security() {
           onChange={handleChange}
           required
         />
-
+        <p>Vehicle Model :</p>
         <input
           name="vehicleModel"
           placeholder="Vehicle Model"
           value={formData.vehicleModel}
           onChange={handleChange}
           required
+        />
+
+        <p>Check-in Date & Time :</p>
+        <input
+          type="datetime-local"
+          value={checkInTime}
+          onChange={(e) => setCheckInTime(e.target.value)}
         />
 
         <div>
