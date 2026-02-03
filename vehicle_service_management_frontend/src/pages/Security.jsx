@@ -11,7 +11,6 @@ function Security() {
   });
 
   const [checkInTime, setCheckInTime] = useState(() => {
-    // default to current datetime in local format
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     return now.toISOString().slice(0, 16);
@@ -23,7 +22,6 @@ function Security() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      // e.target.name is the name attribute of the input field
       [e.target.name]: e.target.value,
     });
   };
@@ -58,63 +56,70 @@ function Security() {
 
   return (
     <div className="container">
+      {/* Header */}
       <div className="header">
-        <h1>Security Dashboard</h1>
+        <div>
+          <h1>Security Dashboard</h1>
+          <p className="muted small">Register incoming vehicles</p>
+        </div>
         <LogoutButton />
       </div>
-
-      <h3>Vehicle Check-In</h3>
 
       {message && <p className="msg-success">{message}</p>}
       {error && <p className="msg-error">{error}</p>}
 
-      <form className="card form" onSubmit={handleSubmit}>
-        <p id="customer-name-label">Customer name :</p>
-        <input
-          name="customerName"
-          placeholder="Customer Name"
-          value={formData.customerName}
-          onChange={handleChange}
-          required
-        />
-        <p>Phone number :</p>
-        <input
-          name="phone"
-          placeholder="Phone Number"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
-        <p>Vehicle details :</p>
-        <input
-          name="vehicleNumber"
-          placeholder="Vehicle Number"
-          value={formData.vehicleNumber}
-          onChange={handleChange}
-          required
-        />
-        <p>Vehicle Model :</p>
-        <input
-          name="vehicleModel"
-          placeholder="Vehicle Model"
-          value={formData.vehicleModel}
-          onChange={handleChange}
-          required
-        />
+      {/* Check-in form */}
+      <div className="card" style={{ maxWidth: 520 }}>
+        <h2 className="mb-1">Vehicle Check-In</h2>
+        <p className="muted small">
+          Enter customer and vehicle details to check in
+        </p>
 
-        <p>Check-in Date & Time :</p>
-        <input
-          type="datetime-local"
-          value={checkInTime}
-          onChange={(e) => setCheckInTime(e.target.value)}
-        />
+        <form className="form" onSubmit={handleSubmit}>
+          <label>Customer Name</label>
+          <input
+            name="customerName"
+            value={formData.customerName}
+            onChange={handleChange}
+            required
+          />
 
-        <div>
-          <button className="btn btn-primary" type="submit">
+          <label>Phone Number</label>
+          <input
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Vehicle Number</label>
+          <input
+            name="vehicleNumber"
+            value={formData.vehicleNumber}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Vehicle Model</label>
+          <input
+            name="vehicleModel"
+            value={formData.vehicleModel}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Check-in Date & Time</label>
+          <input
+            type="datetime-local"
+            value={checkInTime}
+            onChange={(e) => setCheckInTime(e.target.value)}
+          />
+
+          <button className="btn btn-primary mt-1" type="submit">
             Check In Vehicle
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

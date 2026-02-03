@@ -76,21 +76,14 @@ function Advisor() {
     const formData = new FormData();
     formData.append("description", data.description);
     formData.append("estimatedTimeInMinutes", data.estimatedTimeInMinutes);
-    if (data.file) {
-      formData.append("jobFile", data.file);
-    }
+    if (data.file) formData.append("jobFile", data.file);
 
     try {
       await api.post(`/vehicles/${vehicleId}/jobs`, formData);
       setMessage("Job added successfully");
       setError("");
 
-      // clear only this vehicle's form
-      setJobData((prev) => ({
-        ...prev,
-        [vehicleId]: {},
-      }));
-
+      setJobData((prev) => ({ ...prev, [vehicleId]: {} }));
       fetchVehicles();
     } catch {
       setError("Failed to add job");
@@ -101,31 +94,36 @@ function Advisor() {
 
   return (
     <div className="container">
+      {/* Header */}
       <div className="header">
-        <h1>Advisor Dashboard</h1>
+        <div>
+          <h1>Advisor Dashboard</h1>
+          <p className="muted small">Manage assigned vehicles and jobs</p>
+        </div>
         <LogoutButton />
       </div>
 
       {message && <p className="msg-success">{message}</p>}
       {error && <p className="msg-error">{error}</p>}
 
-      <h3>Assigned Vehicles</h3>
-
-      {vehicles.length === 0 && <p>No vehicles assigned.</p>}
+      {vehicles.length === 0 && (
+        <p className="muted">No vehicles assigned.</p>
+      )}
 
       {vehicles
-        .filter((vehicle) => vehicle.currentStatus !== "DELIVERED")
+        .filter((v) => v.currentStatus !== "DELIVERED")
         .map((vehicle) => (
-          <div key={vehicle._id} className="vehicle-card">
-            <div>
+          <div key={vehicle._id} className="card">
+            {/* Vehicle info */}
+            <div className="mb-1">
               <b>{vehicle.vehicleNumber}</b> — {vehicle.vehicleModel}
+              <div className="muted small">
+                Current status: <b>{vehicle.currentStatus}</b>
+              </div>
             </div>
-            <div className="muted">
-              Current Status: <b>{vehicle.currentStatus}</b>
-            </div>
-            <hr />
 
-            <div className="flex-row">
+            {/* Status update */}
+            <div className="flex-row mb-1">
               <select
                 value={selectedStatus[vehicle._id] || ""}
                 onChange={(e) =>
@@ -135,7 +133,7 @@ function Advisor() {
                   }))
                 }
               >
-                <option value="">Update Status</option>
+                <option value="">Update status</option>
                 {statuses.map((status) => (
                   <option key={status} value={status}>
                     {status}
@@ -143,56 +141,73 @@ function Advisor() {
                 ))}
               </select>
 
-              <button className="btn" onClick={() => updateStatus(vehicle._id)}>
+              <button
+                className="btn btn-ghost"
+                onClick={() => updateStatus(vehicle._id)}
+              >
                 Update
               </button>
             </div>
 
-            <hr />
-            <h4>Jobs</h4>
-            {vehicle.jobs?.length === 0 && <p>No jobs added yet.</p>}
-            {vehicle.jobs?.map((job, index) => (
-              <div key={index} className="mb-1">
-                <b>{job.description}</b> ({job.estimatedTimeInMinutes} min)
-                <br />
-                {job.file && (
-                  <a
-                    href={`http://localhost:5000/${job.file}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    View Job Card
-                  </a>
-                )}
-              </div>
-            ))}
+            {/* Existing jobs */}
+            <div className="mb-1">
+              <h4>Jobs</h4>
 
-            <hr />
-            <h4>Add Job</h4>
-            <div className="form">
-              <input
-                name="description"
-                placeholder="Job description"
-                value={jobData[vehicle._id]?.description || ""}
-                onChange={(e) => handleJobChange(vehicle._id, e)}
-              />
+              {vehicle.jobs?.length === 0 && (
+                <p className="muted small">No jobs added yet.</p>
+              )}
 
-              <input
-                name="estimatedTimeInMinutes"
-                placeholder="Estimated time (min)"
-                value={jobData[vehicle._id]?.estimatedTimeInMinutes || ""}
-                onChange={(e) => handleJobChange(vehicle._id, e)}
-              />
+              {vehicle.jobs?.map((job, index) => (
+                <div key={index} className="vehicle-card">
+                  <b>{job.description}</b>{" "}
+                  <span className="muted small">
+                    ({job.estimatedTimeInMinutes} min)
+                  </span>
 
-              <input
-                type="file"
-                name="file"
-                onChange={(e) => handleJobChange(vehicle._id, e)}
-              />
+                  {job.file && (
+                    <div className="mt-1">
+                      <a
+                        href={`http://localhost:5000/${job.file}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View Job Card
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
 
-              <div>
+            {/* Add job */}
+            <div>
+              <h4>Add Job</h4>
+
+              <div className="form">
+                <input
+                  name="description"
+                  placeholder="Job description"
+                  value={jobData[vehicle._id]?.description || ""}
+                  onChange={(e) => handleJobChange(vehicle._id, e)}
+                />
+
+                <input
+                  name="estimatedTimeInMinutes"
+                  placeholder="Estimated time (min)"
+                  value={
+                    jobData[vehicle._id]?.estimatedTimeInMinutes || ""
+                  }
+                  onChange={(e) => handleJobChange(vehicle._id, e)}
+                />
+
+                <input
+                  type="file"
+                  name="file"
+                  onChange={(e) => handleJobChange(vehicle._id, e)}
+                />
+
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-primary mt-1"
                   onClick={() => addJob(vehicle._id)}
                 >
                   Add Job

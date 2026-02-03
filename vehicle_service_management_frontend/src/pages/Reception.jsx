@@ -11,22 +11,22 @@ function Reception() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Fetch checked-in vehicles
+  /* ================= FETCH DATA ================= */
+
   const fetchVehicles = async () => {
     try {
       const res = await api.get("/vehicles?status=CHECKED_IN");
       setVehicles(res.data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch vehicles");
     }
   };
 
-  // Fetch advisors
   const fetchAdvisors = async () => {
     try {
       const res = await api.get("/users?role=ADVISOR");
       setAdvisors(res.data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch advisors");
     }
   };
@@ -36,9 +36,11 @@ function Reception() {
     fetchAdvisors();
   }, []);
 
+  /* ================= ASSIGN ADVISOR ================= */
+
   const assignAdvisor = async (vehicleId) => {
     if (!selectedAdvisor) {
-      setError("Please select an advisor");
+      setError("Please select an advisor first");
       return;
     }
 
@@ -49,30 +51,37 @@ function Reception() {
 
       setMessage("Advisor assigned successfully");
       setError("");
-      fetchVehicles(); // refresh list
+      fetchVehicles();
     } catch (err) {
       setError(err.response?.data?.message || "Assignment failed");
     }
   };
 
+  /* ================= UI ================= */
+
   return (
     <div className="container">
+      {/* Header */}
       <div className="header">
-        <h1>Reception Dashboard</h1>
+        <div>
+          <h1>Reception Dashboard</h1>
+          <p className="muted small">Assign advisors to checked-in vehicles</p>
+        </div>
         <LogoutButton />
       </div>
 
       {message && <p className="msg-success">{message}</p>}
       {error && <p className="msg-error">{error}</p>}
 
-      <h3>Assign Advisor</h3>
+      {/* Advisor selection */}
+      <div className="card">
+        <h2 className="mb-1">Select Advisor</h2>
 
-      <div className="card flex-row">
         <select
           value={selectedAdvisor}
           onChange={(e) => setSelectedAdvisor(e.target.value)}
         >
-          <option value="">Select Advisor</option>
+          <option value="">Choose advisor</option>
           {advisors.map((advisor) => (
             <option key={advisor._id} value={advisor._id}>
               {advisor.name}
@@ -81,25 +90,41 @@ function Reception() {
         </select>
       </div>
 
-      <ul className="list-reset">
+      {/* Vehicles list */}
+      <div className="card">
+        <h2 className="mb-1">Checked-in Vehicles</h2>
+
+        {vehicles.length === 0 && (
+          <p className="muted">No vehicles waiting for assignment.</p>
+        )}
+
         {vehicles.map((vehicle) => (
-          <li key={vehicle._id} className="mt-1">
-            <b>{vehicle.vehicleNumber}</b> — {vehicle.vehicleModel}
-            <button
-              className="btn ml-1"
-              onClick={() => assignAdvisor(vehicle._id)}
-            >
-              Assign
-            </button>
-          </li>
+          <div key={vehicle._id} className="vehicle-card">
+            <div>
+              <b>{vehicle.vehicleNumber}</b> — {vehicle.vehicleModel}
+            </div>
+
+            <div className="flex-row mt-1">
+              <button
+                className="btn btn-primary"
+                onClick={() => assignAdvisor(vehicle._id)}
+              >
+                Assign Advisor
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
-      <button
-        className="btn btn-secondary"
-        onClick={() => navigate("/reception/delivery")}
-      >
-        Go to Delivery
-      </button>
+      </div>
+
+      {/* Navigation */}
+      <div className="mt-1">
+        <button
+          className="btn btn-ghost"
+          onClick={() => navigate("/reception/delivery")}
+        >
+          Go to Delivery
+        </button>
+      </div>
     </div>
   );
 }

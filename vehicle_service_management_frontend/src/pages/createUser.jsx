@@ -18,10 +18,7 @@ function CreateUser() {
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setUserData({
-      ...userData,
-      [e.target.name]: e.target.value,
-    });
+    setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -33,14 +30,8 @@ function CreateUser() {
       await api.post("/users", userData);
       setMessage("User created successfully");
 
-      setUserData({
-        name: "",
-        email: "",
-        password: "",
-        role: "",
-      });
+      setUserData({ name: "", email: "", password: "", role: "" });
 
-      // refresh list if same role is selected
       if (selectedRole === userData.role) {
         fetchUsersByRole(selectedRole);
       }
@@ -63,9 +54,7 @@ function CreateUser() {
   };
 
   useEffect(() => {
-    if (selectedRole) {
-      fetchUsersByRole(selectedRole);
-    }
+    if (selectedRole) fetchUsersByRole(selectedRole);
   }, [selectedRole]);
 
   // ---------------- TOGGLE USER STATUS ----------------
@@ -80,52 +69,88 @@ function CreateUser() {
           u._id === userId ? { ...u, isActive: !currentStatus } : u,
         ),
       );
-    } catch (err) {
+    } catch {
       alert("Failed to update user status");
     }
   };
 
   return (
     <div className="container">
-      <LogoutButton />
+      {/* Header */}
+      <div className="header">
+        <div>
+          <h1>User Management</h1>
+          <p className="muted small">Create users and manage access</p>
+        </div>
 
-      <h1>Create New User</h1>
+        <div className="flex-row">
+          <button className="btn btn-ghost" onClick={() => navigate("/admin")}>
+            Back to Dashboard
+          </button>
+          <LogoutButton />
+        </div>
+      </div>
 
       {message && <p className="msg-success">{message}</p>}
       {error && <p className="msg-error">{error}</p>}
 
-      {/* -------- CREATE USER FORM -------- */}
-      <form className="card" onSubmit={handleSubmit}>
-        <input
-          name="name"
-          placeholder="Name"
-          value={userData.name}
-          onChange={handleChange}
-          required
-        />
+      {/* Create User */}
+      <div className="card">
+        <h2 className="mb-1">Create New User</h2>
 
-        <input
-          name="email"
-          placeholder="Email"
-          value={userData.email}
-          onChange={handleChange}
-          required
-        />
+        <form className="form" onSubmit={handleSubmit}>
+          <label>Name</label>
+          <input
+            name="name"
+            value={userData.name}
+            onChange={handleChange}
+            required
+          />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={userData.password}
-          onChange={handleChange}
-          required
-        />
+          <label>Email</label>
+          <input
+            name="email"
+            value={userData.email}
+            onChange={handleChange}
+            required
+          />
 
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            value={userData.password}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Role</label>
+          <select
+            name="role"
+            value={userData.role}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Role</option>
+            <option value="SECURITY">Security</option>
+            <option value="RECEPTIONIST">Receptionist</option>
+            <option value="ADVISOR">Advisor</option>
+          </select>
+
+          <button className="btn btn-primary mt-1" type="submit">
+            Create User
+          </button>
+        </form>
+      </div>
+
+      {/* User List */}
+      <div className="card">
+        <h2 className="mb-1">Manage Users</h2>
+
+        <label className="muted">Filter by role</label>
         <select
-          name="role"
-          value={userData.role}
-          onChange={handleChange}
-          required
+          value={selectedRole}
+          onChange={(e) => setSelectedRole(e.target.value)}
         >
           <option value="">Select Role</option>
           <option value="SECURITY">Security</option>
@@ -133,63 +158,47 @@ function CreateUser() {
           <option value="ADVISOR">Advisor</option>
         </select>
 
-        <button className="btn btn-primary" type="submit">
-          Create User
-        </button>
-      </form>
+        {users.length === 0 && selectedRole && (
+          <p className="muted mt-1">No users found for this role.</p>
+        )}
 
-      {/* -------- FILTER USERS -------- */}
-      <h2 style={{ marginTop: "30px" }}>View Users By Role</h2>
-
-      <select
-        value={selectedRole}
-        onChange={(e) => setSelectedRole(e.target.value)}
-      >
-        <option value="">Select Role</option>
-        <option value="SECURITY">Security</option>
-        <option value="RECEPTIONIST">Receptionist</option>
-        <option value="ADVISOR">Advisor</option>
-      </select>
-
-      {/* -------- USERS TABLE -------- */}
-      {users.length > 0 && (
-        <table className="user-table" style={{ marginTop: "20px" }}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td>{user.isActive ? "Active" : "Inactive"}</td>
-                <td>
-                  <button
-                    className={
-                      user.isActive ? "btn btn-danger" : "btn btn-success"
-                    }
-                    onClick={() => toggleUserStatus(user._id, user.isActive)}
-                  >
-                    {user.isActive ? "Deactivate" : "Activate"}
-                  </button>
-                </td>
+        {users.length > 0 && (
+          <table className="table mt-1">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
 
-      <button className="btn btn-ghost" onClick={() => navigate("/admin")}>
-        Back to Admin Dashboard
-      </button>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user._id}>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td>{user.isActive ? "Active" : "Inactive"}</td>
+                  <td>
+                    <button
+                      className={`btn ${
+                        user.isActive ? "btn-ghost" : "btn-primary"
+                      }`}
+                      onClick={() =>
+                        toggleUserStatus(user._id, user.isActive)
+                      }
+                    >
+                      {user.isActive ? "Deactivate" : "Activate"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }

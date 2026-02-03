@@ -5,3 +5,4 @@
 # Node dependencies
 node_modules/
 vehicle_service_management_backend/node_modules/
+vehicle_service_management_backend/uploads/

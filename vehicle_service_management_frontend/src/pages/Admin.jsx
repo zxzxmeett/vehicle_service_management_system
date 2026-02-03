@@ -8,13 +8,13 @@ function Admin() {
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
   const [jobsMap, setJobsMap] = useState({});
+  const [activeVehicleId, setActiveVehicleId] = useState(null);
 
-  // fetch daily report
   const fetchDailyReport = async () => {
     try {
       const res = await api.get("/reports/daily");
       setReport(res.data);
-    } catch (err) {
+    } catch {
       setError("Failed to load admin report");
     }
   };
@@ -23,14 +23,11 @@ function Admin() {
     fetchDailyReport();
   }, []);
 
-  // fetch jobs for a vehicle
   const fetchJobs = async (vehicleId) => {
     try {
       const res = await api.get(`/vehicles/${vehicleId}/jobs`);
-      setJobsMap((prev) => ({
-        ...prev,
-        [vehicleId]: res.data,
-      }));
+      setJobsMap((prev) => ({ ...prev, [vehicleId]: res.data }));
+      setActiveVehicleId(vehicleId);
     } catch {
       setError("Failed to load jobs");
     }
@@ -38,86 +35,123 @@ function Admin() {
 
   return (
     <div className="container">
+      {/* Header */}
       <div className="header">
-        <h1>Admin Dashboard</h1>
         <div>
+          <h1>Admin Dashboard</h1>
+          <p className="muted small">Overview of today’s operations</p>
+        </div>
+
+        <div className="flex-row">
           <button
             className="btn btn-primary"
             onClick={() => navigate("/admin/create-user")}
           >
-            Create New User
+            Create User
           </button>
+          <LogoutButton />
         </div>
       </div>
 
-      <LogoutButton />
-
       {error && <p className="msg-error">{error}</p>}
-
       {!report && !error && <p>Loading report...</p>}
 
-      <h2>Daily Report</h2>
-
+      {/* Dashboard Summary */}
       {report && (
-        <>
-          <h3>Date: {report.date}</h3>
-          <h4>Total Vehicles Today: {report.totalVehicles}</h4>
+        <div className="card">
+          <h2 className="mb-1">Today at a glance</h2>
 
-          <div className="card">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Vehicle Number</th>
-                  <th>Status</th>
-                  <th>Service Time (min)</th>
-                  <th>Idle Time (min)</th>
-                  <th>Jobs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {report.vehicles.map((vehicle) => (
-                  <tr key={vehicle.vehicleId}>
-                    <td>{vehicle.vehicleNumber}</td>
-                    <td>{vehicle.currentStatus}</td>
-                    <td>{vehicle.serviceTimeInMinutes}</td>
-                    <td>{vehicle.idleTimeInMinutes}</td>
-                    <td>
-                      <button
-                        className="btn"
-                        onClick={() => fetchJobs(vehicle.vehicleId)}
-                      >
-                        View Jobs
-                      </button>
+          <div className="flex-row" style={{ flexWrap: "wrap" }}>
+            <div className="vehicle-card">
+              <b>{report.totalVehicles}</b>
+              <div className="muted small">Vehicles Today</div>
+            </div>
 
-                      {jobsMap[vehicle.vehicleId]?.length > 0 && (
-                        <div className="muted mt-1">
-                          {jobsMap[vehicle.vehicleId].map((job, i) => (
-                            <div key={i}>
-                              <b>{job.description}</b>
-                              {job.file && (
-                                <>
-                                  {" "}
-                                  —{" "}
-                                  <a
-                                    href={`http://localhost:5000/${job.file}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    View Card
-                                  </a>
-                                </>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="vehicle-card">
+              <b>{report.inService ?? "-"}</b>
+              <div className="muted small">In Service</div>
+            </div>
+
+            <div className="vehicle-card">
+              <b>{report.readyForDelivery ?? "-"}</b>
+              <div className="muted small">Ready</div>
+            </div>
+
+            {report.pendingPayments != null && (
+              <div className="vehicle-card">
+                <b>{report.pendingPayments}</b>
+                <div className="muted small">Pending Payments</div>
+              </div>
+            )}
           </div>
-        </>
+        </div>
+      )}
+
+      {/* Vehicles Table */}
+      {report && (
+        <div className="card">
+          <h2>Vehicles</h2>
+
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>Status</th>
+                <th>Service Time</th>
+                <th>Idle Time</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.vehicles.map((v) => (
+                <tr key={v.vehicleId}>
+                  <td>{v.vehicleNumber}</td>
+                  <td>{v.currentStatus}</td>
+                  <td>{v.serviceTimeInMinutes} min</td>
+                  <td>{v.idleTimeInMinutes} min</td>
+                  <td>
+                    <button
+                      className="btn btn-ghost"
+                      onClick={() => fetchJobs(v.vehicleId)}
+                    >
+                      View Jobs
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Jobs Panel */}
+      {activeVehicleId && jobsMap[activeVehicleId] && (
+        <div className="card">
+          <h2>Jobs for Vehicle</h2>
+
+          {jobsMap[activeVehicleId].length === 0 ? (
+            <p className="muted">No jobs found.</p>
+          ) : (
+            <ul className="list-reset">
+              {jobsMap[activeVehicleId].map((job, i) => (
+                <li key={i} className="vehicle-card">
+                  <b>{job.description}</b>
+                  {job.file && (
+                    <div className="mt-1">
+                      <a
+                        href={`http://localhost:5000/${job.file}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View Job Card
+                      </a>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       )}
     </div>
   );
