@@ -99,9 +99,15 @@ label { font-weight: 600; color: var(--muted); }
   margin-top: 0.01rem;
 }
 
+.btn-wrapper{
+  display: flex;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
 /* Buttons */
 .btn {
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 2rem;
   border-radius: 6px;
   border: 1px solid transparent;
   font-weight: 600;
@@ -175,4 +181,42 @@ label { font-weight: 600; color: var(--muted); }
   vertical-align: middle;
   margin-right: 0.5rem;
   fill: var(--accent);
+}
+.file-upload {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.file-upload:hover {
+  border-color: var(--accent);
+}
+
+.file-upload.drag-active {
+  background: rgba(96, 165, 250, 0.08);
+  border-color: var(--accent);
+}
+
+.file-btn {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.file-name {
+  font-size: 0.8rem;
+  color: var(--muted);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

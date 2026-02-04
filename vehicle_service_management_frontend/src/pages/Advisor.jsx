@@ -8,6 +8,7 @@ function Advisor() {
   const [jobData, setJobData] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [dragActive, setDragActive] = useState(false);
 
   const statuses = [
     "IN_SERVICE",
@@ -106,9 +107,7 @@ function Advisor() {
       {message && <p className="msg-success">{message}</p>}
       {error && <p className="msg-error">{error}</p>}
 
-      {vehicles.length === 0 && (
-        <p className="muted">No vehicles assigned.</p>
-      )}
+      {vehicles.length === 0 && <p className="muted">No vehicles assigned.</p>}
 
       {vehicles
         .filter((v) => v.currentStatus !== "DELIVERED")
@@ -163,7 +162,6 @@ function Advisor() {
                   <span className="muted small">
                     ({job.estimatedTimeInMinutes} min)
                   </span>
-
                   {job.file && (
                     <div className="mt-1">
                       <a
@@ -194,24 +192,53 @@ function Advisor() {
                 <input
                   name="estimatedTimeInMinutes"
                   placeholder="Estimated time (min)"
-                  value={
-                    jobData[vehicle._id]?.estimatedTimeInMinutes || ""
-                  }
+                  value={jobData[vehicle._id]?.estimatedTimeInMinutes || ""}
                   onChange={(e) => handleJobChange(vehicle._id, e)}
                 />
 
-                <input
-                  type="file"
-                  name="file"
-                  onChange={(e) => handleJobChange(vehicle._id, e)}
-                />
-
-                <button
-                  className="btn btn-primary mt-1"
-                  onClick={() => addJob(vehicle._id)}
+                <div
+                  className={`file-upload ${dragActive ? "drag-active" : ""}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragActive(true);
+                  }}
+                  onDragLeave={() => setDragActive(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragActive(false);
+                    handleJobChange(vehicle._id, {
+                      target: {
+                        name: "file",
+                        files: e.dataTransfer.files,
+                      },
+                    });
+                  }}
                 >
-                  Add Job
-                </button>
+                  <label htmlFor={`file-${vehicle._id}`} className="file-btn">
+                    Choose File or Drag here
+                  </label>
+
+                  <span className="file-name">
+                    {jobData[vehicle._id]?.file?.name || "No file selected"}
+                  </span>
+
+                  <input
+                    id={`file-${vehicle._id}`}
+                    type="file"
+                    name="file"
+                    hidden
+                    onChange={(e) => handleJobChange(vehicle._id, e)}
+                  />
+                </div>
+
+                <div className="btn-wrapper">
+                  <button
+                    className="btn btn-primary mt-1"
+                    onClick={() => addJob(vehicle._id)}
+                  >
+                    Add Job
+                  </button>
+                </div>
               </div>
             </div>
           </div>
