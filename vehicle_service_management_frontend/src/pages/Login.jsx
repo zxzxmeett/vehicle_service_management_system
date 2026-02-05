@@ -38,7 +38,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-slate-200 flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 flex items-center justify-center gap-3">
@@ -113,7 +113,7 @@ function Login() {
 
         {/* Footer hint */}
         <p className="mt-6 text-center text-xs text-slate-500">
-          Authorized personnel only
+          Authorized Staff only
         </p>
       </div>
     </div>
