@@ -94,155 +94,186 @@ function Advisor() {
   /* ================= UI ================= */
 
   return (
-    <div className="container">
+    <div className="min-h-screen bg-slate-100 px-6 py-8">
       {/* Header */}
-      <div className="header">
+      <div className="mb-10 flex items-center justify-between">
         <div>
-          <h1>Advisor Dashboard</h1>
-          <p className="muted small">Manage assigned vehicles and jobs</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            Advisor Dashboard
+          </h1>
+          <p className="text-sm text-slate-500">
+            Manage assigned vehicles and jobs
+          </p>
         </div>
         <LogoutButton />
       </div>
 
-      {message && <p className="msg-success">{message}</p>}
-      {error && <p className="msg-error">{error}</p>}
-
-      {vehicles.length === 0 && <p className="muted">No vehicles assigned.</p>}
-
-      {vehicles
-        .filter((v) => v.currentStatus !== "DELIVERED")
-        .map((vehicle) => (
-          <div key={vehicle._id} className="card">
-            {/* Vehicle info */}
-            <div className="mb-1">
-              <b>{vehicle.vehicleNumber}</b> — {vehicle.vehicleModel}
-              <div className="muted small">
-                Current status: <b>{vehicle.currentStatus}</b>
-              </div>
+      {/* Messages */}
+      {(message || error) && (
+        <div className="mb-6 max-w-xl space-y-2">
+          {message && (
+            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700">
+              {message}
             </div>
-
-            {/* Status update */}
-            <div className="flex-row mb-1">
-              <select
-                value={selectedStatus[vehicle._id] || ""}
-                onChange={(e) =>
-                  setSelectedStatus((prev) => ({
-                    ...prev,
-                    [vehicle._id]: e.target.value,
-                  }))
-                }
-              >
-                <option value="">Update status</option>
-                {statuses.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                className="btn btn-ghost"
-                onClick={() => updateStatus(vehicle._id)}
-              >
-                Update
-              </button>
+          )}
+          {error && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+              {error}
             </div>
+          )}
+        </div>
+      )}
 
-            {/* Existing jobs */}
-            <div className="mb-1">
-              <h4>Jobs</h4>
+      {vehicles.length === 0 && (
+        <p className="text-sm text-slate-500">No vehicles assigned.</p>
+      )}
 
-              {vehicle.jobs?.length === 0 && (
-                <p className="muted small">No jobs added yet.</p>
-              )}
-
-              {vehicle.jobs?.map((job, index) => (
-                <div key={index} className="vehicle-card">
-                  <b>{job.description}</b>{" "}
-                  <span className="muted small">
-                    ({job.estimatedTimeInMinutes} min)
-                  </span>
-                  {job.file && (
-                    <div className="mt-1">
-                      <a
-                        href={`http://localhost:5000/${job.file}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View Job Card
-                      </a>
+      {/* Layout */}
+      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-3">
+        {/* LEFT: Vehicles */}
+        <div className="lg:col-span-2 space-y-6">
+          {vehicles
+            .filter((v) => v.currentStatus !== "DELIVERED")
+            .map((vehicle) => (
+              <div
+                key={vehicle._id}
+                className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
+              >
+                {/* Vehicle Header */}
+                <div className="mb-4 flex items-start justify-between">
+                  <div>
+                    <div className="text-base font-semibold text-slate-900">
+                      {vehicle.vehicleNumber}
                     </div>
-                  )}
+                    <div className="text-sm text-slate-500">
+                      {vehicle.vehicleModel}
+                    </div>
+                    <div className="mt-1 text-sm text-slate-600">
+                      Status:{" "}
+                      <span className="font-medium text-slate-900">
+                        {vehicle.currentStatus}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Status Update */}
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedStatus[vehicle._id] || ""}
+                      onChange={(e) =>
+                        setSelectedStatus((prev) => ({
+                          ...prev,
+                          [vehicle._id]: e.target.value,
+                        }))
+                      }
+                      className="h-10 w-[160px] rounded-md border border-slate-300 bg-white px-4 pr-10 text-sm text-slate-900 appearance-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
+                    >
+                      <option value="" disabled>
+                        Update status
+                      </option>
+                      {statuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status.replaceAll("_", " ")}
+                        </option>
+                      ))}
+                    </select>
+
+                    <button
+                      onClick={() => updateStatus(vehicle._id)}
+                      className="h-9 rounded-md px-4 text-sm font-medium text-white
+             bg-slate-900 hover:bg-slate-800 transition"
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Add job */}
-            <div>
-              <h4>Add Job</h4>
+                {/* Jobs */}
+                <div className="space-y-2">
+                  {vehicle.jobs?.length === 0 && (
+                    <p className="text-sm text-slate-500">No jobs added yet.</p>
+                  )}
 
-              <div className="form">
-                <input
-                  name="description"
-                  placeholder="Job description"
-                  value={jobData[vehicle._id]?.description || ""}
-                  onChange={(e) => handleJobChange(vehicle._id, e)}
-                />
+                  {vehicle.jobs?.map((job, index) => (
+                    <div
+                      key={index}
+                      className="rounded-md bg-slate-50 p-3 text-sm"
+                    >
+                      <span className="font-medium text-slate-900">
+                        {job.description}
+                      </span>
+                      <span className="ml-2 text-slate-500">
+                        ({job.estimatedTimeInMinutes} min)
+                      </span>
 
-                <input
-                  name="estimatedTimeInMinutes"
-                  placeholder="Estimated time (min)"
-                  value={jobData[vehicle._id]?.estimatedTimeInMinutes || ""}
-                  onChange={(e) => handleJobChange(vehicle._id, e)}
-                />
+                      {job.file && (
+                        <div className="mt-1">
+                          <a
+                            href={`http://localhost:5000/${job.file}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-slate-700 underline hover:text-slate-900"
+                          >
+                            View Job Card
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
 
-                <div
-                  className={`file-upload ${dragActive ? "drag-active" : ""}`}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragActive(true);
-                  }}
-                  onDragLeave={() => setDragActive(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setDragActive(false);
-                    handleJobChange(vehicle._id, {
-                      target: {
-                        name: "file",
-                        files: e.dataTransfer.files,
-                      },
-                    });
-                  }}
-                >
-                  <label htmlFor={`file-${vehicle._id}`} className="file-btn">
-                    Choose File or Drag here
-                  </label>
-
-                  <span className="file-name">
-                    {jobData[vehicle._id]?.file?.name || "No file selected"}
-                  </span>
+                {/* Add Job (compact) */}
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <input
+                    name="description"
+                    placeholder="Job description"
+                    value={jobData[vehicle._id]?.description || ""}
+                    onChange={(e) => handleJobChange(vehicle._id, e)}
+                    className="h-9 rounded-md border border-slate-300 px-2 text-sm
+                             focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
+                  />
 
                   <input
-                    id={`file-${vehicle._id}`}
-                    type="file"
-                    name="file"
-                    hidden
+                    name="estimatedTimeInMinutes"
+                    placeholder="Time (min)"
+                    value={jobData[vehicle._id]?.estimatedTimeInMinutes || ""}
                     onChange={(e) => handleJobChange(vehicle._id, e)}
+                    className="h-9 rounded-md border border-slate-300 px-2 text-sm
+                             focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
                   />
-                </div>
 
-                <div className="btn-wrapper">
                   <button
-                    className="btn btn-primary mt-1"
                     onClick={() => addJob(vehicle._id)}
+                    className="h-9 rounded-md bg-slate-900 text-sm text-white
+                             transition hover:bg-slate-800"
                   >
                     Add Job
                   </button>
                 </div>
               </div>
-            </div>
+            ))}
+        </div>
+
+        {/* RIGHT: Guidelines (once) */}
+        <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+          <h3 className="mb-3 text-sm font-semibold text-slate-900">
+            Advisor Guidelines
+          </h3>
+
+          <ul className="space-y-2 text-sm text-slate-600">
+            <li>• Update vehicle status as work progresses</li>
+            <li>• Add all service jobs before QC</li>
+            <li>• Include estimated time for each job</li>
+            <li>• Upload job cards when required</li>
+            <li>• Delivered vehicles disappear automatically</li>
+          </ul>
+
+          <div className="mt-6 rounded-md bg-slate-50 p-4 text-sm text-slate-600">
+            <strong className="block text-slate-800 mb-1">Workflow Tip</strong>
+            Keep job descriptions short and precise for faster approvals.
           </div>
-        ))}
+        </div>
+      </div>
     </div>
   );
 }

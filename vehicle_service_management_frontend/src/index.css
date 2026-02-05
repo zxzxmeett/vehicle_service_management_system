@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --accent: #2563eb;
   --text: #1f2937;
@@ -14,9 +18,9 @@
   background-color: var(--bg);
 }
 
-/* Dark theme overrides: add the 'dark-theme' class to <html> to enable */
+/* Dark theme overrides: add the 'dark' class to <html> to enable */
 /* ===== Improved Dark Theme ===== */
-.dark-theme {
+.dark {
   /* Base colors */
   --bg: #0a0f1c;
   --surface: #121a2a;
