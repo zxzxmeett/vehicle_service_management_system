@@ -68,7 +68,7 @@ function ThemeToggle() {
             strokeLinejoin="round"
           />
         </svg>
-      )}
+      ) }
     </button>
   );
 }

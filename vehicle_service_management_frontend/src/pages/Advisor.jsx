@@ -66,6 +66,36 @@ function Advisor() {
     }));
   };
 
+  const handleDrag = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (e.type === "dragenter" || e.type === "dragover") {
+    setDragActive(true);
+  } else if (e.type === "dragleave") {
+    setDragActive(false);
+  }
+};
+
+const handleDrop = (vehicleId, e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  setDragActive(false);
+
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    const file = e.dataTransfer.files[0];
+
+    setJobData((prev) => ({
+      ...prev,
+      [vehicleId]: {
+        ...prev[vehicleId],
+        file,
+      },
+    }));
+  }
+};
+
+
   const addJob = async (vehicleId) => {
     const data = jobData[vehicleId];
 
@@ -224,32 +254,79 @@ function Advisor() {
                   </div>
 
                   {/* Add Job (compact) */}
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    <input
-                      name="description"
-                      placeholder="Job description"
-                      value={jobData[vehicle._id]?.description || ""}
-                      onChange={(e) => handleJobChange(vehicle._id, e)}
-                      className="h-9 rounded-md border border-slate-300 px-2 text-sm
-                             focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
-                    />
+                  {/* Add Job */}
+                  <div className="mt-4 space-y-3">
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <input
+                        name="description"
+                        placeholder="Job description"
+                        value={jobData[vehicle._id]?.description || ""}
+                        onChange={(e) => handleJobChange(vehicle._id, e)}
+                        className="h-9 rounded-md border border-slate-300 px-2 text-sm
+                 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
+                      />
 
-                    <input
-                      name="estimatedTimeInMinutes"
-                      placeholder="Time (min)"
-                      value={jobData[vehicle._id]?.estimatedTimeInMinutes || ""}
-                      onChange={(e) => handleJobChange(vehicle._id, e)}
-                      className="h-9 rounded-md border border-slate-300 px-2 text-sm
-                             focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
-                    />
+                      <input
+                        name="estimatedTimeInMinutes"
+                        placeholder="Time (min)"
+                        value={
+                          jobData[vehicle._id]?.estimatedTimeInMinutes || ""
+                        }
+                        onChange={(e) => handleJobChange(vehicle._id, e)}
+                        className="h-9 rounded-md border border-slate-300 px-2 text-sm
+                 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
+                      />
 
-                    <button
-                      onClick={() => addJob(vehicle._id)}
-                      className="h-9 rounded-md bg-slate-900 text-sm text-white
-                             transition hover:bg-slate-800"
+                      <button
+                        onClick={() => addJob(vehicle._id)}
+                        className="h-9 rounded-md bg-slate-900 text-sm text-white
+                 transition hover:bg-slate-800"
+                      >
+                        Add Job
+                      </button>
+                    </div>
+
+                    {/* Upload Area */}
+                    <div
+                      onDragEnter={handleDrag}
+                      onDragOver={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDrop={(e) => handleDrop(vehicle._id, e)}
+                      className={`flex cursor-pointer flex-col items-center justify-center
+      rounded-md border-2 border-dashed p-4 text-sm transition
+      ${
+        dragActive
+          ? "border-slate-900 bg-slate-100"
+          : "border-slate-300 bg-slate-50"
+      }`}
                     >
-                      Add Job
-                    </button>
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) => handleJobChange(vehicle._id, e)}
+                        className="hidden"
+                        id={`file-${vehicle._id}`}
+                      />
+
+                      <label
+                        htmlFor={`file-${vehicle._id}`}
+                        className="text-center"
+                      >
+                        <span className="font-medium text-slate-900">
+                          Drag & drop job card here
+                        </span>
+                        <br />
+                        <span className="text-slate-500">
+                          or click to upload (PNG, JPG, PDF)
+                        </span>
+                      </label>
+
+                      {jobData[vehicle._id]?.file && (
+                        <p className="mt-2 text-xs text-slate-600">
+                          Selected: {jobData[vehicle._id].file.name}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
