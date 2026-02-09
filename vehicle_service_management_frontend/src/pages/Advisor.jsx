@@ -125,7 +125,7 @@ const handleDrop = (vehicleId, e) => {
 
   return (
     <div className="min-h-screen bg-slate-200 px-6 pt-10 pb-8">
-      <div className="mx-auto max-w-4xl space-y-8">
+      <div className="mx-auto max-w-5xl space-y-8">
         {" "}
         {/* Header */}
         <div className="mb-10 flex items-center justify-between">
