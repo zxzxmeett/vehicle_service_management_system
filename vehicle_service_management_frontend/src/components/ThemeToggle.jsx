@@ -35,6 +35,7 @@ function ThemeToggle() {
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          className="text-white"
         >
           <path
             d="M12 4V2M12 22v-2M4.22 4.22L2.81 2.81M21.19 21.19l-1.41-1.41M2 12H4M20 12h2M4.22 19.78l1.41 1.41M21.19 2.81l-1.41 1.41"

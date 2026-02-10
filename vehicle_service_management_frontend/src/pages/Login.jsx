@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import ThemeToggle from "../components/ThemeToggle";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -38,13 +39,19 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-200 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] flex items-center justify-center px-6 transition-colors duration-300">
+      {/* Floating Toggle for Login Page */}
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 flex items-center justify-center gap-3">
           <svg
-            className="h-10 w-10 text-slate-900"
+            className="h-10 w-10 text-slate-900 dark:text-blue-500"
             viewBox="0 0 24 24"
+            fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
@@ -52,29 +59,29 @@ function Login() {
           </svg>
 
           <div className="text-left">
-            <h1 className="text-lg font-semibold text-slate-900">
+            <h1 className="text-lg font-semibold text-slate-900 dark:text-[#e6eef6]">
               Vehicle Service
             </h1>
-            <p className="text-sm text-slate-500">Internal Management System</p>
+            <p className="text-sm text-slate-500 dark:text-[#9fb0c3]">Internal Management System</p>
           </div>
         </div>
 
         {/* Login Card */}
-        <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-          <h2 className="text-lg font-medium text-slate-900">Sign in</h2>
-          <p className="mb-6 text-sm text-slate-500">
+        <div className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
+          <h2 className="text-lg font-medium text-slate-900 dark:text-[#e6eef6]">Sign in</h2>
+          <p className="mb-6 text-sm text-slate-500 dark:text-[#9fb0c3]">
             Use your work credentials to continue
           </p>
 
           {error && (
-            <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <div className="mb-4 rounded-md border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 px-3 py-2 text-sm text-red-700 dark:text-red-400">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Email
               </label>
               <input
@@ -82,13 +89,13 @@ function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-11 w-full rounded-md border border-slate-300 px-3 transition
-                         focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
+                className="h-11 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-slate-900 dark:text-white transition
+                         focus:border-slate-900 dark:focus:border-blue-500 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-blue-500/10 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Password
               </label>
               <input
@@ -96,15 +103,15 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-11 w-full rounded-md border border-slate-300 px-3 transition
-                         focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:outline-none"
+                className="h-11 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-slate-900 dark:text-white transition
+                         focus:border-slate-900 dark:focus:border-blue-500 focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-blue-500/10 focus:outline-none"
               />
             </div>
 
             <button
               type="submit"
-              className="h-11 w-full rounded-md bg-slate-900 text-white
-                       transition hover:bg-slate-800 active:scale-[0.99]"
+              className="h-11 w-full rounded-md bg-slate-900 dark:bg-blue-600 text-white
+                       transition hover:bg-slate-800 dark:hover:bg-blue-500 active:scale-[0.99]"
             >
               Login
             </button>
@@ -112,7 +119,7 @@ function Login() {
         </div>
 
         {/* Footer hint */}
-        <p className="mt-6 text-center text-xs text-slate-500">
+        <p className="mt-6 text-center text-xs text-slate-500 dark:text-[#9fb0c3]">
           Authorized Staff only
         </p>
       </div>

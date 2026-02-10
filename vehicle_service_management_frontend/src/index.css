@@ -5,12 +5,14 @@
 :root {
   --accent: #2563eb;
   --text: #1f2937;
-  --bg: #ffffff;
+  --bg: #f1f5f9; /* slate-100 */
   --muted: #6b7280;
   --border: #e6e9ee;
   --surface: #ffffff;
   --success: #2f855a;
   --danger: #c53030;
+  --text-main: #0f172a; /* slate-900 */
+  --text-muted: #64748b; /* slate-500 */
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -18,25 +20,33 @@
   background-color: var(--bg);
 }
 
+/* index.css */
+@layer components {
+  .card-container {
+    @apply rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200 
+           dark:bg-[#121a2a] dark:ring-[#243047];
+  }
+  
+  .input-field {
+    @apply h-11 w-full rounded-md border border-slate-300 bg-white px-3 
+           text-slate-900 transition focus:border-slate-900 focus:ring-2 
+           focus:ring-slate-900/10 focus:outline-none
+           dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-blue-500;
+  }
+} 
+
 /* Dark theme overrides: add the 'dark' class to <html> to enable */
 /* ===== Improved Dark Theme ===== */
 .dark {
-  /* Base colors */
   --bg: #0a0f1c;
   --surface: #121a2a;
+  --text-main: #e6eef6;
+  --text-muted: #9fb0c3;
   --border: #243047;
-
-  /* Text */
-  --text: #e6eef6;
-  --muted: #9fb0c3;
-
-  /* Accent & states */
-  --accent: #60a5fa;
-  --success: #68d391;
-  --danger: #f87171;
-
-  color: var(--text);
+  
+  /* Force global background */
   background-color: var(--bg);
+  color: var(--text-main);
 }
 
 
