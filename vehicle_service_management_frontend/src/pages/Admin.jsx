@@ -56,12 +56,6 @@ function Admin() {
       (v) => normalize(v.currentStatus) === STATUS.DELIVERD,
     ).length ?? 0;
 
-  const STATUS_STYLES = {
-    IN_SERVICE: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30",
-    READY_FOR_DELIVERY: "bg-blue-100 text-blue-800 dark:bg-blue-900/30",
-    DELIVERED: "bg-green-100 text-green-800 dark:bg-green-900/30",
-  };
-
   return (
     <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-10 pb-8 transition-colors duration-300">
       <div className="mx-auto max-w-5xl space-y-8">
