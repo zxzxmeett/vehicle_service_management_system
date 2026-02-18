@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 //allowed roles are passed as props from App.jsx
+//children is component Admin, Security etc
 function ProtectedRoute({ children, allowedRoles }) {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");

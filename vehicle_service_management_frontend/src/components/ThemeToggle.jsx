@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 function ThemeToggle() {
   const [theme, setTheme] = useState(() =>
     typeof window !== "undefined"
-      ? localStorage.getItem("theme") || "light"
-      : "light",
+      ? localStorage.getItem("theme") || "dark"
+      : "dark",
   );
 
   useEffect(() => {

@@ -32,6 +32,7 @@ function Reception() {
     }
   };
 
+  //initial loading, runs when page loads, reception immediately sees... 
   useEffect(() => {
     fetchVehicles();
     fetchAdvisors();

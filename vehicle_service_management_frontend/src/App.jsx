@@ -17,11 +17,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/admin" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Admin /></ProtectedRoute>} />
+        <Route path="/admin/create-user" element={<ProtectedRoute allowedRoles={["ADMIN"]}><CreateUser /></ProtectedRoute>} />
         <Route path="/security" element={<ProtectedRoute allowedRoles={["SECURITY"]}><Security /></ProtectedRoute>} />
         <Route path="/reception" element={<ProtectedRoute allowedRoles={["RECEPTIONIST"]}><Reception /></ProtectedRoute>} />
+        <Route path="/reception/delivery" allowedRoles={["RECEPTIONIST"]} element={<ReceptionDelivery />} />
         <Route path="/advisor" element={<ProtectedRoute allowedRoles={["ADVISOR"]}><Advisor /></ProtectedRoute>} />
-        <Route path="/admin/create-user" element={<ProtectedRoute allowedRoles={["ADMIN"]}><CreateUser /></ProtectedRoute>} />
-        <Route path="/reception/delivery" element={<ReceptionDelivery />} />
       </Routes>
     </BrowserRouter>
   );
