@@ -44,7 +44,7 @@ function Admin() {
 
   const inServiceCount =
     report?.vehicles?.filter(
-      (v) => normalize(v.currentStatus) === STATUS.IN_SERVICE,
+      (v) => normalize(v.currentStatus) === STATUS.IN_SERVICE || normalize(v.currentStatus) === "QC_PENDING"
     ).length ?? 0;
 
   const readyCount =

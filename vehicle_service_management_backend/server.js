@@ -12,8 +12,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/reports", reportRoutes);
-
 app.get("/", (req, res) => {
   res.send("Vehicle Service Management API running");
 });
@@ -26,10 +24,10 @@ const { errorHandler } = require("./src/middleware/errorMiddleware");
 app.use(errorHandler);
 
 app.use("/uploads", express.static("uploads"));
-
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/reports", reportRoutes);
 
 const PORT = process.env.PORT;
 
