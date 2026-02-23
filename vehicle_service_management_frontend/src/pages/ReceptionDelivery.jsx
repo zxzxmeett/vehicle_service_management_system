@@ -35,7 +35,7 @@ function ReceptionDelivery() {
 
   return (
     <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-10 pb-8 transition-colors duration-300">
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto max-w-6xl space-y-8">
         {" "}
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -65,7 +65,7 @@ function ReceptionDelivery() {
             {error}
           </div>
         )}
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           <div className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
             <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-[#e6eef6]">
               Pending Completion

@@ -63,7 +63,7 @@ function Reception() {
 
 return (
     <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-10 pb-8 transition-colors duration-300">
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -74,7 +74,17 @@ return (
               Assign advisors to checked-in vehicles
             </p>
           </div>
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
+            {/* Navigation */}
+          <div>
+            <button
+              onClick={() => navigate("/reception/delivery")}
+              className="rounded-md border border-slate-300 dark:border-slate-700 px-4 py-2 text-sm
+                     text-slate-700 dark:text-slate-300 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+            >
+              Go to Delivery
+            </button>
+          </div>
             <ThemeToggle />
             <LogoutButton />
           </div>
@@ -96,7 +106,7 @@ return (
           </div>
         )}
 
-        <div className="mx-auto max-w-5xl space-y-8">
+        <div className="mx-auto max-w-6xl space-y-8">
           {/* Advisor selection */}
           <div className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
             <h2 className="mb-1 text-lg font-medium text-slate-900 dark:text-[#e6eef6]">
@@ -160,17 +170,6 @@ return (
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Navigation */}
-          <div>
-            <button
-              onClick={() => navigate("/reception/delivery")}
-              className="rounded-md border border-slate-300 dark:border-slate-700 px-4 py-2 text-sm
-                     text-slate-700 dark:text-slate-300 transition hover:bg-slate-200 dark:hover:bg-slate-800"
-            >
-              Go to Delivery
-            </button>
           </div>
         </div>
       </div>

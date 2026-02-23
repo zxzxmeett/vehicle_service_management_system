@@ -58,7 +58,7 @@ function Admin() {
 
   return (
     <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-10 pb-8 transition-colors duration-300">
-      <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div className="mb-10 flex items-center justify-between">
           <div>
@@ -73,8 +73,9 @@ function Admin() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/admin/create-user")}
-              className="h-10 rounded-md bg-slate-900 dark:bg-blue-600 px-4 text-sm font-medium text-white
-                     transition hover:bg-slate-800 dark:hover:bg-blue-500"
+              className="h-9 rounded-md border border-slate-300 dark:border-slate-700 
+                 px-4 text-sm font-medium text-slate-700 dark:text-slate-200
+                 transition hover:bg-slate-200 dark:hover:bg-slate-800"
             >
               Create User
             </button>
