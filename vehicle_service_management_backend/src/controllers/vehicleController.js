@@ -4,7 +4,8 @@ const User = require("../models/User");
 const { calculateTimes } = require("../utils/timeCalculator");
 
 exports.checkInVehicle = asyncHandler(async (req, res) => {
-  const { customerName, phone, vehicleNumber, vehicleModel, checkInTime } = req.body;
+  const { customerName, phone, vehicleNumber, vehicleModel, checkInTime } =
+    req.body;
 
   if (!customerName || !phone || !vehicleNumber || !vehicleModel) {
     res.status(400);
@@ -182,19 +183,32 @@ exports.getVehicleJobs = async (req, res) => {
   }
 
   res.json(vehicle.jobs);
-}; 
+};
 
-//Reception approval
-exports.markReceptionDone = async (req, res) => {
-  const { id } = req.params;
+//Delivery by reception
+exports.deliver = async (req, res) => {
+  try {
+    const vehicle = await VehicleEntry.findById(req.params.id);
 
-  const vehicle = await VehicleEntry.findById(id);
-  if (!vehicle) {
-    return res.status(404).json({ message: "Vehicle not found" });
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    if (vehicle.currentStatus !== "READY_FOR_DELIVERY") {
+      return res.status(400).json({
+        message: "Vehicle is not ready for delivery",
+      });
+    }
+
+    vehicle.currentStatus = "DELIVERED";
+
+    await vehicle.save();
+
+    res.json({
+      message: "Vehicle delivered successfully",
+      vehicle,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
-
-  vehicle.isReceptionCompleted = true;
-  await vehicle.save();
-
-  res.json({ message: "Vehicle marked as completed" });
 };

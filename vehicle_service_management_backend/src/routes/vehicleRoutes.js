@@ -9,6 +9,7 @@ const { getVehiclesByStatus } = require("../controllers/vehicleController");
 const { getAssignedVehicles } = require("../controllers/vehicleController");
 const { getVehicleJobs } = require("../controllers/vehicleController");
 const { markReceptionDone } = require("../controllers/vehicleController");
+const { deliver } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -69,10 +70,10 @@ router.get(
 );
 
 router.patch(
-  "/:id/reception-done",
+  "/:id/deliver",
   protect,
   authorizeRoles("RECEPTIONIST"),
-  markReceptionDone
+  deliver
 );
 
 module.exports = router;

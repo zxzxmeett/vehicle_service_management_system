@@ -11,7 +11,7 @@ function Advisor() {
   const [error, setError] = useState("");
   const [dragActive, setDragActive] = useState(false);
 
-  const statuses = ["IN_SERVICE", "QC_PENDING", "READY_FOR_DELIVERY", "DELIVERED"];
+  const statuses = ["IN_SERVICE", "QC_PENDING", "READY_FOR_DELIVERY"];
 
   const fetchVehicles = async () => {
     try {
@@ -119,7 +119,7 @@ function Advisor() {
 
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
-            {vehicles.filter((v) => v.currentStatus !== "DELIVERED").map((vehicle) => (
+            {vehicles.filter((v) => v.currentStatus !== "READY_FOR_DELIVERY").map((vehicle) => (
               <div key={vehicle._id} className="rounded-xl bg-white dark:bg-[#121a2a] p-5 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
                 <div className="mb-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div>
