@@ -12,6 +12,7 @@ function Advisor() {
   const [dragActive, setDragActive] = useState(false);
 
   const statuses = ["IN_SERVICE", "QC_PENDING", "READY_FOR_DELIVERY"];
+  const reworkStatuses = ["REWORK_REQUESTED", "IN_REWORK", "REWORK_QC_PENDING"];
 
   const fetchVehicles = async () => {
     try {
@@ -221,36 +222,39 @@ function Advisor() {
                       )}
                     </div>
 
-                    {/* Status Update Controls */}
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={selectedStatus[vehicle._id] || ""}
-                        onChange={(e) =>
-                          setSelectedStatus((prev) => ({
-                            ...prev,
-                            [vehicle._id]: e.target.value,
-                          }))
-                        }
-                        className="min-h-[40px] px-3 py-2 rounded-md border border-slate-300 dark:border-slate-700
-                                  bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none"
-                      >
-                        <option value="" disabled>
-                          Update status
-                        </option>
-                        {statuses.map((s) => (
-                          <option key={s} value={s}>
-                            {s.replaceAll("_", " ")}
+                    {/* Status Update Controls — ONLY for normal flow */}
+                    {!reworkStatuses.includes(vehicle.currentStatus) && (
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={selectedStatus[vehicle._id] || ""}
+                          onChange={(e) =>
+                            setSelectedStatus((prev) => ({
+                              ...prev,
+                              [vehicle._id]: e.target.value,
+                            }))
+                          }
+                          className="min-h-[40px] px-3 py-2 rounded-md border border-slate-300 dark:border-slate-700
+                                      bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none"
+                        >
+                          <option value="" disabled>
+                            Update status
                           </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={() => updateStatus(vehicle._id)}
-                        className="h-10 rounded-md bg-blue-600 px-5 text-sm font-medium text-white
-                      hover:bg-blue-500 transition"
-                      >
-                        Save
-                      </button>
-                    </div>
+                          {statuses.map((s) => (
+                            <option key={s} value={s}>
+                              {s.replaceAll("_", " ")}
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          onClick={() => updateStatus(vehicle._id)}
+                          className="h-10 rounded-md bg-blue-600 px-5 text-sm font-medium text-white
+                                    hover:bg-blue-500 transition"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    )}
 
                     {/* ===== Rework Actions ===== */}
 
