@@ -8,8 +8,13 @@ const upload = require("../middleware/uploadMiddleware");
 const { getVehiclesByStatus } = require("../controllers/vehicleController");
 const { getAssignedVehicles } = require("../controllers/vehicleController");
 const { getVehicleJobs } = require("../controllers/vehicleController");
-const { markReceptionDone } = require("../controllers/vehicleController");
 const { deliver } = require("../controllers/vehicleController");
+const {
+  requestRework,
+  startRework,
+  sendReworkToQC,
+  completeRework,
+} = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -67,6 +72,34 @@ router.get(
   protect,
   authorizeRoles("ADMIN"),
   getVehicleJobs
+);
+
+router.patch(
+  "/:id/request-rework",
+  protect,
+  authorizeRoles("RECEPTIONIST"),
+  requestRework
+);
+
+router.patch(
+  "/:id/start-rework",
+  protect,
+  authorizeRoles("ADVISOR"),
+  startRework
+);
+
+router.patch(
+  "/:id/rework-qc",
+  protect,
+  authorizeRoles("ADVISOR"),
+  sendReworkToQC
+);
+
+router.patch(
+  "/:id/rework-done",
+  protect,
+  authorizeRoles("ADVISOR"),
+  completeRework
 );
 
 router.patch(

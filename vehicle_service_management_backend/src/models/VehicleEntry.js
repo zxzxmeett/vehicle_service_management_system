@@ -19,17 +19,22 @@ const jobSchema = new mongoose.Schema(
   },
   { _id: false },
 );
+
 const statusHistorySchema = new mongoose.Schema(
   {
     status: {
       type: String,
       enum: [
         "CHECKED_IN",
-        "WAITING_FOR_ADVISOR",
         "ADVISOR_ASSIGNED",
         "IN_SERVICE",
         "QC_PENDING",
         "READY_FOR_DELIVERY",
+        //rework cycle
+        "REWORK_REQUESTED",
+        "IN_REWORK",
+        "REWORK_QC_PENDING",
+        "REWORK_DONE",
         "DELIVERED",
       ],
       required: true,
@@ -65,23 +70,42 @@ const vehicleEntrySchema = new mongoose.Schema(
       type: String,
       enum: [
         "CHECKED_IN",
-        "WAITING_FOR_ADVISOR",
         "ADVISOR_ASSIGNED",
         "IN_SERVICE",
         "QC_PENDING",
         "READY_FOR_DELIVERY",
+        "REWORK_REQUESTED",
+        "IN_REWORK",
+        "REWORK_QC_PENDING",
+        "REWORK_DONE",
         "DELIVERED",
       ],
       default: "CHECKED_IN",
     },
-    //here
     statusHistory: [statusHistorySchema],
 
     assignedAdvisor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    //here
+
+    reworkReason: {
+      type: String,
+    },
+
+    reworkCount: {
+      type: Number,
+      default: 0,
+    },
+
+    lastReworkAt: {
+      type: Date,
+    },
+
+    qcRemarks: {
+      type: String,
+    },
+    
     jobs: [jobSchema],
 
     checkInTime: {
@@ -101,3 +125,4 @@ const vehicleEntrySchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("VehicleEntry", vehicleEntrySchema);
+ 

@@ -321,14 +321,14 @@ function Advisor() {
 
           {/* ===== Guidelines Panel ===== */}
           <aside
-            className="lg:col-span-1 h-fit sticky top-24 rounded-xl bg-white dark:bg-[#121a2a]
+            className="lg:col-span-1 h-fit sticky top-20 rounded-xl bg-white dark:bg-[#121a2a]
           p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]"
           >
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
               Advisor Guidelines
             </h3>
 
-            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+            <ul className="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <li>Update status as work progresses</li>
               <li>Add all jobs before QC stage</li>
               <li>Include estimated time</li>
