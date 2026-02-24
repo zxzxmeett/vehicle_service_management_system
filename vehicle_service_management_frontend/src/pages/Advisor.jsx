@@ -98,6 +98,37 @@ function Advisor() {
     }
   };
 
+  const startRework = async (vehicleId) => {
+    try {
+      await api.patch(`/vehicles/${vehicleId}/start-rework`);
+      fetchVehicles();
+    } catch {
+      setError("Failed to start rework");
+    }
+  };
+
+  const sendReworkToQC = async (vehicleId) => {
+    try {
+      await api.patch(`/vehicles/${vehicleId}/rework-qc`);
+      fetchVehicles();
+    } catch {
+      setError("Failed to send rework to QC");
+    }
+  };
+
+  const completeRework = async (vehicleId) => {
+    const qcRemarks = prompt("QC remarks (optional):");
+
+    try {
+      await api.patch(`/vehicles/${vehicleId}/rework-done`, {
+        qcRemarks,
+      });
+      fetchVehicles();
+    } catch {
+      setError("Failed to complete rework");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-[#0a0f1c]">
       {/* ===== Sticky Top Bar ===== */}
@@ -151,6 +182,9 @@ function Advisor() {
                   "ADVISOR_ASSIGNED",
                   "IN_SERVICE",
                   "QC_PENDING",
+                  "REWORK_REQUESTED",
+                  "IN_REWORK",
+                  "REWORK_QC_PENDING",
                 ].includes(v.currentStatus),
               )
               .map((vehicle) => (
@@ -175,6 +209,16 @@ function Advisor() {
                       >
                         {vehicle.currentStatus.replaceAll("_", " ")}
                       </span>
+                      {vehicle.reworkReason && (
+                        <p className="text-xs text-red-500 mt-1">
+                          Rework Reason: {vehicle.reworkReason}
+                        </p>
+                      )}
+                      {vehicle.reworkCount > 0 && (
+                        <p className="text-xs text-orange-500 mt-1">
+                          Rework #{vehicle.reworkCount}
+                        </p>
+                      )}
                     </div>
 
                     {/* Status Update Controls */}
@@ -199,7 +243,6 @@ function Advisor() {
                           </option>
                         ))}
                       </select>
-
                       <button
                         onClick={() => updateStatus(vehicle._id)}
                         className="h-10 rounded-md bg-blue-600 px-5 text-sm font-medium text-white
@@ -208,6 +251,35 @@ function Advisor() {
                         Save
                       </button>
                     </div>
+
+                    {/* ===== Rework Actions ===== */}
+
+                    {vehicle.currentStatus === "REWORK_REQUESTED" && (
+                      <button
+                        onClick={() => startRework(vehicle._id)}
+                        className="h-10 rounded-md bg-orange-500 px-4 text-sm font-medium text-white hover:bg-orange-400"
+                      >
+                        Start Rework
+                      </button>
+                    )}
+
+                    {vehicle.currentStatus === "IN_REWORK" && (
+                      <button
+                        onClick={() => sendReworkToQC(vehicle._id)}
+                        className="h-10 rounded-md bg-purple-600 px-4 text-sm font-medium text-white hover:bg-purple-500"
+                      >
+                        Send to QC
+                      </button>
+                    )}
+
+                    {vehicle.currentStatus === "REWORK_QC_PENDING" && (
+                      <button
+                        onClick={() => completeRework(vehicle._id)}
+                        className="h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-500"
+                      >
+                        Mark Rework Done
+                      </button>
+                    )}
                   </div>
 
                   {/* ===== Jobs List ===== */}

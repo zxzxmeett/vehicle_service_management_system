@@ -69,11 +69,7 @@ exports.updateVehicleStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const vehicleId = req.params.id;
 
-  const allowedStatuses = [
-    "IN_SERVICE",
-    "QC_PENDING",
-    "READY_FOR_DELIVERY",
-  ];
+  const allowedStatuses = ["IN_SERVICE", "QC_PENDING", "READY_FOR_DELIVERY"];
 
   if (!status || !allowedStatuses.includes(status)) {
     res.status(400);
@@ -186,15 +182,17 @@ exports.getVehicleJobs = async (req, res) => {
 
 exports.requestRework = asyncHandler(async (req, res) => {
   const vehicle = await VehicleEntry.findById(req.params.id);
-  
+
   if (!vehicle) {
     res.status(404);
     throw new Error("Vehicle not found");
   }
-  
-  if (vehicle.currentStatus !== "READY_FOR_DELIVERY") {
+
+  const allowedStatuses = ["READY_FOR_DELIVERY", "REWORK_DONE"];
+
+  if (!allowedStatuses.includes(vehicle.currentStatus)) {
     res.status(400);
-    throw new Error("Rework allowed only after READY_FOR_DELIVERY");
+    throw new Error("Rework allowed only after service completion");
   }
 
   const { reason } = req.body;
@@ -256,7 +254,7 @@ exports.sendReworkToQC = asyncHandler(async (req, res) => {
   }
 
   vehicle.currentStatus = "REWORK_QC_PENDING";
-  
+
   vehicle.statusHistory.push({
     status: "REWORK_QC_PENDING",
   });
@@ -305,10 +303,7 @@ exports.deliver = async (req, res) => {
       return res.status(404).json({ message: "Vehicle not found" });
     }
 
-    const allowedStatuses = [
-      "READY_FOR_DELIVERY",
-      "REWORK_DONE",
-    ];
+    const allowedStatuses = ["READY_FOR_DELIVERY", "REWORK_DONE"];
 
     if (!allowedStatuses.includes(vehicle.currentStatus)) {
       return res.status(400).json({

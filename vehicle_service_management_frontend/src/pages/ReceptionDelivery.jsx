@@ -11,10 +11,30 @@ function ReceptionDelivery() {
 
   const fetchVehicles = async () => {
     try {
-      const res = await api.get("/vehicles?status=READY_FOR_DELIVERY");
-      setVehicles(res.data);
+      const [readyRes, reworkRes] = await Promise.all([
+        api.get("/vehicles?status=READY_FOR_DELIVERY"),
+        api.get("/vehicles?status=REWORK_DONE"),
+      ]);
+
+      setVehicles([...readyRes.data, ...reworkRes.data]);
     } catch {
-      setError("Failed to fetch delivered vehicles");
+      setError("Failed to fetch vehicles");
+    }
+  };
+
+  const sendForRework = async (vehicleId) => {
+    const reason = prompt("Enter reason for rework:");
+
+    if (!reason) return;
+
+    try {
+      await api.patch(`/vehicles/${vehicleId}/request-rework`, {
+        reason,
+      });
+
+      setVehicles((prev) => prev.filter((v) => v._id !== vehicleId));
+    } catch {
+      alert("Failed to request rework");
     }
   };
 
@@ -88,18 +108,48 @@ function ReceptionDelivery() {
                       <p className="font-medium text-slate-900 dark:text-[#e6eef6]">
                         {v.vehicleNumber}
                       </p>
+
                       <p className="text-sm text-slate-500 dark:text-[#9fb0c3]">
                         {v.customerName}
                       </p>
+
+                      {/* Rework Count */}
+                      {v.reworkCount > 0 && (
+                        <p className="text-xs text-orange-500 mt-1">
+                          Rework #{v.reworkCount}
+                        </p>
+                      )}
+
+                      {/* Rework Reason */}
+                      {v.reworkReason && (
+                        <p className="text-xs text-red-500 mt-1">
+                          Reason: {v.reworkReason}
+                        </p>
+                      )}
                     </div>
 
-                    <button
-                      onClick={() => markDelivered(v._id)}
-                      className="h-9 rounded-md bg-green-600 px-4 text-sm font-medium
-                      text-white transition hover:bg-green-500 active:scale-[0.99]"
-                    >
-                      Deliver Vehicle
-                    </button>
+                    <div className="flex gap-2">
+                      {/* Deliver button — allowed for READY_FOR_DELIVERY & REWORK_DONE */}
+                      <button
+                        onClick={() => markDelivered(v._id)}
+                        className="h-9 rounded-md bg-green-600 px-4 text-sm font-medium
+                                  text-white transition hover:bg-green-500 active:scale-[0.99]"
+                      >
+                        Deliver
+                      </button>
+
+                      {/* Rework button — ONLY for READY_FOR_DELIVERY */}
+                      {(v.currentStatus === "READY_FOR_DELIVERY" ||
+                        v.currentStatus === "REWORK_DONE") && (
+                        <button
+                          onClick={() => sendForRework(v._id)}
+                          className="h-9 rounded-md bg-yellow-500 px-4 text-sm font-medium
+                            text-white transition hover:bg-yellow-400"
+                        >
+                          Rework
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
