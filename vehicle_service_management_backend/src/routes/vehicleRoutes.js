@@ -11,6 +11,7 @@ const { getVehicleJobs } = require("../controllers/vehicleController");
 const { deliver } = require("../controllers/vehicleController");
 const { updateVehicleDetails } = require("../controllers/vehicleController");
 const {requestRework,startRework,sendReworkToQC,completeRework,} = require("../controllers/vehicleController");
+const { updatePaymentStatus } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -103,6 +104,15 @@ router.patch(
   protect,
   authorizeRoles("ADVISOR"),
   completeRework
+);
+
+// routes/vehicleRoutes.js
+
+router.patch(
+  "/:id/payment",
+  protect,
+  authorizeRoles("RECEPTIONIST"), // or "RECEPTION_DELIVERY"
+  updatePaymentStatus
 );
 
 router.patch(

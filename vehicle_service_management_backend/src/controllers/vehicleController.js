@@ -341,6 +341,38 @@ exports.completeRework = asyncHandler(async (req, res) => {
   res.json(vehicle);
 });
 
+// controllers/vehicleController.js
+exports.updatePaymentStatus = asyncHandler(async (req, res) => {
+  console.log(req.user.role);
+  const vehicle = await VehicleEntry.findById(req.params.id);
+
+  if (!vehicle) {
+    res.status(404);
+    throw new Error("Vehicle not found");
+  }
+
+  const { paymentStatus } = req.body;
+
+  const allowed = ["PENDING", "PARTIAL", "PAID"];
+
+  if (!paymentStatus || !allowed.includes(paymentStatus)) {
+    res.status(400);
+    throw new Error("Invalid payment status");
+  }
+
+  // Allow payment only when ready for delivery (recommended rule)
+  if (vehicle.currentStatus !== "READY_FOR_DELIVERY") {
+    res.status(400);
+    throw new Error("Payment can only be updated at delivery stage");
+  }
+
+  vehicle.paymentStatus = paymentStatus;
+
+  await vehicle.save();
+
+  res.json(vehicle);
+});
+
 //Delivery by reception
 exports.deliver = async (req, res) => {
   try {

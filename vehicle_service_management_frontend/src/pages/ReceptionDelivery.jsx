@@ -7,6 +7,8 @@ import ThemeToggle from "../components/ThemeToggle";
 function ReceptionDelivery() {
   const [vehicles, setVehicles] = useState([]);
   const [error, setError] = useState("");
+  const [paymentSelection, setPaymentSelection] = useState({});
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const fetchVehicles = async () => {
@@ -19,6 +21,42 @@ function ReceptionDelivery() {
       setVehicles([...readyRes.data, ...reworkRes.data]);
     } catch {
       setError("Failed to fetch vehicles");
+    }
+  };
+
+  const handlePaymentChange = (vehicleId, value) => {
+    setPaymentSelection((prev) => ({
+      ...prev,
+      [vehicleId]: value,
+    }));
+  };
+
+  const updatePaymentStatus = async (vehicleId) => {
+    const selected = paymentSelection[vehicleId];
+
+    if (!selected) {
+      setError("Please select payment status");
+      return;
+    }
+
+    try {
+      await api.patch(`/vehicles/${vehicleId}/payment`, {
+        paymentStatus: selected,
+      });
+
+      setMessage("Payment status updated");
+      setError("");
+
+      // Wrap refresh separately
+      try {
+        await fetchVehicles();
+      } catch {
+        console.warn("Refresh failed, but update succeeded");
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Failed to update payment status",
+      );
     }
   };
 
@@ -80,6 +118,15 @@ function ReceptionDelivery() {
             <LogoutButton />
           </div>
         </div>
+        {message && (
+          <div
+            className="mb-6 max-w-xl rounded-lg border border-green-200 bg-green-50
+                  dark:bg-green-900/20 dark:border-green-800 px-4 py-2 text-sm
+                  text-green-700 dark:text-green-400"
+          >
+            {message}
+          </div>
+        )}
         {error && (
           <div className="mb-6 max-w-xl rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-400">
             {error}
@@ -128,27 +175,76 @@ function ReceptionDelivery() {
                       )}
                     </div>
 
-                    <div className="flex gap-2">
-                      {/* Deliver button — allowed for READY_FOR_DELIVERY & REWORK_DONE */}
-                      <button
-                        onClick={() => markDelivered(v._id)}
-                        className="h-9 rounded-md bg-green-600 px-4 text-sm font-medium
-                                  text-white transition hover:bg-green-500 active:scale-[0.99]"
-                      >
-                        Deliver
-                      </button>
-
-                      {/* Rework button — ONLY for READY_FOR_DELIVERY */}
-                      {(v.currentStatus === "READY_FOR_DELIVERY" ||
-                        v.currentStatus === "REWORK_DONE") && (
-                        <button
-                          onClick={() => sendForRework(v._id)}
-                          className="h-9 rounded-md bg-yellow-500 px-4 text-sm font-medium
-                            text-white transition hover:bg-yellow-400"
+                    <div className="flex flex-col items-start gap-2">
+                      {/* ===== Buttons Row ===== */}
+                      <div className="flex gap-2">
+                        <select
+                          value={
+                            paymentSelection[v._id] ||
+                            v.paymentStatus ||
+                            "PENDING"
+                          }
+                          onChange={(e) =>
+                            handlePaymentChange(v._id, e.target.value)
+                          }
+                          className="h-10 rounded-md border border-slate-300 dark:border-slate-700
+                 bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
                         >
-                          Rework
+                          <option value="PENDING">Pending</option>
+                          <option value="PARTIAL">Partial</option>
+                          <option value="PAID">Paid</option>
+                        </select>
+
+                        <button
+                          onClick={() => updatePaymentStatus(v._id)}
+                          className="h-10 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500"
+                        >
+                          Update
                         </button>
-                      )}
+
+                        <button
+                          onClick={() => markDelivered(v._id)}
+                          disabled={
+                            (v.paymentStatus || paymentSelection[v._id]) !==
+                            "PAID"
+                          }
+                          className={`h-10 rounded-md px-4 text-sm font-medium text-white transition
+                                      ${
+                                      (v.paymentStatus || paymentSelection[v._id]) === "PAID"
+                                       ? "bg-green-600 hover:bg-green-500"
+                                        : "bg-gray-400 cursor-not-allowed"
+                                         }`}
+                        >
+                          Deliver
+                        </button>
+
+                        {(v.currentStatus === "READY_FOR_DELIVERY" ||
+                          v.currentStatus === "REWORK_DONE") && (
+                          <button
+                            onClick={() => sendForRework(v._id)}
+                            className="h-10 rounded-md bg-yellow-500 px-4 text-sm font-medium text-white hover:bg-yellow-400"
+                          >
+                            Rework
+                          </button>
+                        )}
+                      </div>
+
+                      {/* ===== Status UNDER Buttons ===== */}
+                      <div className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                        <div>
+                          Status:{" "}
+                          <span className="font-medium text-slate-900 dark:text-white">
+                            {v.currentStatus.replaceAll("_", " ")}
+                          </span>
+                        </div>
+
+                        <div>
+                          Payment:{" "}
+                          <span className="font-medium text-slate-900 dark:text-white">
+                            {v.paymentStatus || "PENDING"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
