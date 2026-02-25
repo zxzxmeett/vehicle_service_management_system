@@ -9,12 +9,8 @@ const { getVehiclesByStatus } = require("../controllers/vehicleController");
 const { getAssignedVehicles } = require("../controllers/vehicleController");
 const { getVehicleJobs } = require("../controllers/vehicleController");
 const { deliver } = require("../controllers/vehicleController");
-const {
-  requestRework,
-  startRework,
-  sendReworkToQC,
-  completeRework,
-} = require("../controllers/vehicleController");
+const { updateVehicleDetails } = require("../controllers/vehicleController");
+const {requestRework,startRework,sendReworkToQC,completeRework,} = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -52,6 +48,13 @@ router.post(
   upload.single("jobFile"),
   addJob
 );
+//advisor can add details
+router.patch(
+  "/:id/details",
+  protect,
+  authorizeRoles("ADVISOR"),
+  updateVehicleDetails
+)
 
 router.get(
   "/",

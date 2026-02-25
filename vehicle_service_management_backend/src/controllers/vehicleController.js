@@ -3,8 +3,8 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const { calculateTimes } = require("../utils/timeCalculator");
 
+//security
 exports.checkInVehicle = asyncHandler(async (req, res) => {
-
   const data = { ...req.body };
   for (const key in data) {
     if (data[key] === "") data[key] = undefined;
@@ -29,11 +29,10 @@ exports.checkInVehicle = asyncHandler(async (req, res) => {
     throw new Error("Basic required fields missing");
   }
 
-   if (!serviceType) {
+  if (!serviceType) {
     res.status(400);
     throw new Error("Service type is required");
   }
-
 
   const vehicle = await VehicleEntry.create({
     customerName,
@@ -55,6 +54,7 @@ exports.checkInVehicle = asyncHandler(async (req, res) => {
   res.status(201).json(vehicle);
 });
 
+//reception
 exports.assignAdvisor = asyncHandler(async (req, res) => {
   //user don't type advisor id directly in body, they select from list and id extracted via frontend
   const { advisorId } = req.body;
@@ -91,6 +91,7 @@ exports.assignAdvisor = asyncHandler(async (req, res) => {
   res.json(vehicle);
 });
 
+//advisor
 exports.updateVehicleStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const vehicleId = req.params.id;
@@ -121,23 +122,6 @@ exports.updateVehicleStatus = asyncHandler(async (req, res) => {
   res.json(vehicle);
 });
 
-exports.getVehicleTimes = asyncHandler(async (req, res) => {
-  const vehicle = await VehicleEntry.findById(req.params.id);
-
-  if (!vehicle) {
-    res.status(404);
-    throw new Error("Vehicle not found");
-  }
-
-  const times = calculateTimes(vehicle.statusHistory);
-
-  res.json({
-    vehicleId: vehicle._id,
-    currentStatus: vehicle.currentStatus,
-    ...times,
-  });
-});
-
 exports.addJob = asyncHandler(async (req, res) => {
   const { description, estimatedTimeInMinutes } = req.body;
   const vehicleId = req.params.id;
@@ -162,6 +146,49 @@ exports.addJob = asyncHandler(async (req, res) => {
   await vehicle.save();
 
   res.status(201).json(vehicle.jobs);
+});
+
+exports.updateVehicleDetails = asyncHandler(async (req, res) => {
+  console.log("BODY:", req.body);
+  const vehicle = await VehicleEntry.findById(req.params.id);
+
+  if (!vehicle) {
+    res.status(404);
+    throw new Error("Vehicle not found");
+  }
+
+  const { priority, estimatedCost, isInsuranceJob } = req.body;
+
+  if (priority !== undefined) vehicle.priority = priority;
+
+  if (estimatedCost !== undefined) {
+    vehicle.estimatedCost = estimatedCost;
+  }
+
+  if (isInsuranceJob !== undefined) {
+    vehicle.isInsuranceJob = isInsuranceJob;
+  }
+
+  await vehicle.save();
+
+  res.json(vehicle);
+});
+
+exports.getVehicleTimes = asyncHandler(async (req, res) => {
+  const vehicle = await VehicleEntry.findById(req.params.id);
+
+  if (!vehicle) {
+    res.status(404);
+    throw new Error("Vehicle not found");
+  }
+
+  const times = calculateTimes(vehicle.statusHistory);
+
+  res.json({
+    vehicleId: vehicle._id,
+    currentStatus: vehicle.currentStatus,
+    ...times,
+  });
 });
 
 // for receptionist and admin to filter vehicles by status

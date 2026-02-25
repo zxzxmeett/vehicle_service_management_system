@@ -14,11 +14,42 @@ function Advisor() {
   const statuses = ["IN_SERVICE", "QC_PENDING", "READY_FOR_DELIVERY"];
   const reworkStatuses = ["REWORK_REQUESTED", "IN_REWORK", "REWORK_QC_PENDING"];
 
+  const [details, setDetails] = useState({});
+
+  const handleDetailChange = (vehicleId, e) => {
+    setDetails((prev) => ({
+      ...prev,
+      [vehicleId]: {
+        ...prev[vehicleId],
+        [e.target.name]: e.target.value,
+      },
+    }));
+  };
+
+  const handleDetailCheckbox = (vehicleId, e) => {
+    setDetails((prev) => ({
+      ...prev,
+      [vehicleId]: {
+        ...prev[vehicleId],
+        [e.target.name]: e.target.checked,
+      },
+    }));
+  };
+  const updateVehicleDetails = async (vehicleId) => {
+    try {
+      await api.patch(`/vehicles/${vehicleId}/details`, details[vehicleId]);
+      setMessage("Details updated");
+      setError("");
+      fetchVehicles();
+    } catch {
+      setError("Failed to update details");
+    }
+  };
   const fetchVehicles = async () => {
     try {
       const res = await api.get("/vehicles/assigned");
       setVehicles(res.data);
-    } catch {
+    } catch (err) {
       setError("Failed to fetch vehicles");
     }
   };
@@ -118,9 +149,8 @@ function Advisor() {
   };
 
   const completeRework = async (vehicleId) => {
-
     try {
-      await api.patch(`/vehicles/${vehicleId}/rework-done`,);
+      await api.patch(`/vehicles/${vehicleId}/rework-done`);
       fetchVehicles();
     } catch {
       setError("Failed to complete rework");
@@ -188,22 +218,22 @@ function Advisor() {
               .map((vehicle) => (
                 <div
                   key={vehicle._id}
-                  className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]"
+                  className="rounded-xl bg-white dark:bg-[#121a2a] shadow-sm ring-1 ring-slate-200 dark:ring-[#243047] overflow-hidden"
                 >
-                  {/* Vehicle Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
+                  {/* ===== Header ===== */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     <div>
                       <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                         {vehicle.vehicleNumber}
                       </h2>
 
                       <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {vehicle.vehicleModel}
+                        {vehicle.vehicleBrand} {vehicle.vehicleModel}
                       </p>
 
                       <span
                         className="inline-block mt-2 rounded-full px-3 py-1 text-xs font-medium
-                    bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+        bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                       >
                         {vehicle.currentStatus.replaceAll("_", " ")}
                       </span>
@@ -219,102 +249,165 @@ function Advisor() {
                       )}
                     </div>
 
-                    {/* Status Update Controls — ONLY for normal flow */}
-                    {!reworkStatuses.includes(vehicle.currentStatus) && (
-                      <div className="flex items-center gap-2">
-                        <select
-                          value={selectedStatus[vehicle._id] || ""}
-                          onChange={(e) =>
-                            setSelectedStatus((prev) => ({
-                              ...prev,
-                              [vehicle._id]: e.target.value,
-                            }))
-                          }
-                          className="min-h-[40px] px-3 py-2 rounded-md border border-slate-300 dark:border-slate-700
-                                      bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none"
-                        >
-                          <option value="" disabled>
-                            Update status
-                          </option>
-                          {statuses.map((s) => (
-                            <option key={s} value={s}>
-                              {s.replaceAll("_", " ")}
-                            </option>
-                          ))}
-                        </select>
+                    {/* ===== ACTIONS AREA ===== */}
 
-                        <button
-                          onClick={() => updateStatus(vehicle._id)}
-                          className="h-10 rounded-md bg-blue-600 px-5 text-sm font-medium text-white
-                                    hover:bg-blue-500 transition"
-                        >
-                          Save
-                        </button>
-                      </div>
-                    )}
-
-                    {/* ===== Rework Actions ===== */}
-
-                    {vehicle.currentStatus === "REWORK_REQUESTED" && (
-                      <button
-                        onClick={() => startRework(vehicle._id)}
-                        className="h-10 rounded-md bg-orange-500 px-4 text-sm font-medium text-white hover:bg-orange-400"
-                      >
-                        Start Rework
-                      </button>
-                    )}
-
-                    {vehicle.currentStatus === "IN_REWORK" && (
-                      <button
-                        onClick={() => sendReworkToQC(vehicle._id)}
-                        className="h-10 rounded-md bg-purple-600 px-4 text-sm font-medium text-white hover:bg-purple-500"
-                      >
-                        Send to QC
-                      </button>
-                    )}
-
-                    {vehicle.currentStatus === "REWORK_QC_PENDING" && (
-                      <button
-                        onClick={() => completeRework(vehicle._id)}
-                        className="h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-500"
-                      >
-                        Mark Rework Done
-                      </button>
-                    )}
-                  </div>
-
-                  {/* ===== Jobs List ===== */}
-                  <div className="space-y-3 mb-5">
-                    {vehicle.jobs?.map((job, index) => (
-                      <div
-                        key={index}
-                        className="rounded-lg border border-slate-200 dark:border-slate-800
-                      bg-slate-50 dark:bg-slate-900/40 p-3 text-sm"
-                      >
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          {job.description}
-                        </div>
-
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
-                          Estimated: {job.estimatedTimeInMinutes} min
-                        </div>
-
-                        {job.file && (
-                          <a
-                            href={`http://localhost:5000/${job.file}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-blue-600 dark:text-blue-400 text-xs underline"
+                    <div className="flex items-center gap-2">
+                      {/* Normal Flow Controls */}
+                      {!reworkStatuses.includes(vehicle.currentStatus) && (
+                        <>
+                          <select
+                            value={selectedStatus[vehicle._id] || ""}
+                            onChange={(e) =>
+                              setSelectedStatus((prev) => ({
+                                ...prev,
+                                [vehicle._id]: e.target.value,
+                              }))
+                            }
+                            className="h-10 rounded-md border border-slate-300 dark:border-slate-700
+                   bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
                           >
-                            View Job Card
-                          </a>
-                        )}
-                      </div>
-                    ))}
+                            <option value="" disabled>
+                              Update status
+                            </option>
+                            {statuses.map((s) => (
+                              <option key={s} value={s}>
+                                {s.replaceAll("_", " ")}
+                              </option>
+                            ))}
+                          </select>
+
+                          <button
+                            onClick={() => updateStatus(vehicle._id)}
+                            className="h-10 rounded-md bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-500"
+                          >
+                            Save
+                          </button>
+                        </>
+                      )}
+
+                      {/* 🔥 Rework Actions (ALWAYS checked separately) */}
+
+                      {vehicle.currentStatus === "REWORK_REQUESTED" && (
+                        <button
+                          onClick={() => startRework(vehicle._id)}
+                          className="h-10 rounded-md bg-orange-500 px-4 text-sm font-medium text-white hover:bg-orange-400"
+                        >
+                          Start Rework
+                        </button>
+                      )}
+
+                      {vehicle.currentStatus === "IN_REWORK" && (
+                        <button
+                          onClick={() => sendReworkToQC(vehicle._id)}
+                          className="h-10 rounded-md bg-purple-600 px-4 text-sm font-medium text-white hover:bg-purple-500"
+                        >
+                          Send to QC
+                        </button>
+                      )}
+
+                      {vehicle.currentStatus === "REWORK_QC_PENDING" && (
+                        <button
+                          onClick={() => completeRework(vehicle._id)}
+                          className="h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-500"
+                        >
+                          Mark Rework Done
+                        </button>
+                      )}
+                    </div>
                   </div>
 
-                  {/* ===== Add Job Section ===== */}
-                  <div className="space-y-4">
+                  {/* ===== DETAILS SECTION ===== */}
+                  <div className="px-6 py-5 bg-slate-50 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-800">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+                      Vehicle Details
+                    </h3>
+
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      {/* Priority */}
+                      <select
+                        name="priority"
+                        value={details[vehicle._id]?.priority || "NORMAL"}
+                        onChange={(e) => handleDetailChange(vehicle._id, e)}
+                        className="h-10 rounded-md border border-slate-300 dark:border-slate-700
+                   bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
+                      >
+                        <option value="LOW">Low</option>
+                        <option value="NORMAL">Normal</option>
+                        <option value="HIGH">High</option>
+                        <option value="EMERGENCY">Emergency</option>
+                      </select>
+
+                      {/* Estimated Cost */}
+                      <input
+                        type="number"
+                        name="estimatedCost"
+                        placeholder="Estimated cost"
+                        value={details[vehicle._id]?.estimatedCost || ""}
+                        onChange={(e) => handleDetailChange(vehicle._id, e)}
+                        className="h-10 rounded-md border border-slate-300 dark:border-slate-700
+                   bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
+                      />
+
+                      {/* Insurance */}
+                      <label className="flex items-center gap-2 text-sm text-slate-900 dark:text-white">
+                        <input
+                          type="checkbox"
+                          name="isInsuranceJob"
+                          checked={
+                            details[vehicle._id]?.isInsuranceJob || false
+                          }
+                          onChange={(e) => handleDetailCheckbox(vehicle._id, e)}
+                        />
+                        Insurance Job
+                      </label>
+
+                      {/* Save Button */}
+                      <button
+                        onClick={() => updateVehicleDetails(vehicle._id)}
+                        className="sm:col-span-3 h-10 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-500"
+                      >
+                        Save Details
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ===== JOBS SECTION ===== */}
+                  <div className="px-6 py-5 space-y-4">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                      Jobs
+                    </h3>
+
+                    {/* Jobs List */}
+                    <div className="space-y-3">
+                      {vehicle.jobs?.map((job, index) => (
+                        <div
+                          key={index}
+                          className="rounded-lg border border-slate-200 dark:border-slate-800
+                   bg-slate-50 dark:bg-slate-900/40 p-3 text-sm"
+                        >
+                          <div className="font-medium text-slate-900 dark:text-white">
+                            {job.description}
+                          </div>
+
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            Estimated: {job.estimatedTimeInMinutes} min
+                          </div>
+
+                          {job.file && (
+                            <a
+                              href={`http://localhost:5000/${job.file}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-blue-600 dark:text-blue-400 text-xs underline"
+                            >
+                              View Job Card
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add Job Inputs */}
                     <div className="grid gap-3 sm:grid-cols-3">
                       <input
                         name="description"
@@ -322,7 +415,7 @@ function Advisor() {
                         value={jobData[vehicle._id]?.description || ""}
                         onChange={(e) => handleJobChange(vehicle._id, e)}
                         className="h-10 rounded-md border border-slate-300 dark:border-slate-700
-                      bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
+                 bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
                       />
 
                       <input
@@ -333,7 +426,7 @@ function Advisor() {
                         }
                         onChange={(e) => handleJobChange(vehicle._id, e)}
                         className="h-10 rounded-md border border-slate-300 dark:border-slate-700
-                      bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
+                 bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-white"
                       />
 
                       <button
@@ -345,19 +438,19 @@ function Advisor() {
                       </button>
                     </div>
 
-                    {/* Drag Upload */}
+                    {/* Drag & Drop Upload (RESTORED) */}
                     <div
                       onDragEnter={handleDrag}
                       onDragOver={handleDrag}
                       onDragLeave={handleDrag}
                       onDrop={(e) => handleDrop(vehicle._id, e)}
                       className={`flex flex-col items-center justify-center rounded-md
-                    border-2 border-dashed p-5 text-sm transition
-                    ${
-                      dragActive
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10"
-                        : "border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30"
-                    }`}
+      border-2 border-dashed p-5 text-sm transition
+      ${
+        dragActive
+          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10"
+          : "border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30"
+      }`}
                     >
                       <input
                         type="file"

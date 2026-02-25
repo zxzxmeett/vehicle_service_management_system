@@ -50,6 +50,11 @@ const statusHistorySchema = new mongoose.Schema(
 // jobSchema and statusHistorySchema are sub-schemas used within vehicleEntrySchema
 const vehicleEntrySchema = new mongoose.Schema(
   {
+    //basic details
+    vehicleNumber: {
+      type: String,
+      required: true,
+    },
     customerName: {
       type: String,
       required: true,
@@ -58,25 +63,25 @@ const vehicleEntrySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    vehicleNumber: {
+    
+    //service details
+    vehicleBrand: {
       type: String,
-      required: true,
     },
     vehicleModel: {
-      type: String,
-    },
-    serviceType: {
-      type: String,
-      enum: ["PAID_SERVICE", "FREE_SERVICE", "ACCIDENT"],
-      required: true,
-    },
-    vehicleBrand: {
       type: String,
     },
     fuelType: {
       type: String,
       enum: ["PETROL", "DIESEL", "CNG", "EV", "HYBRID"],
     },
+    serviceType: {
+      type: String,
+      enum: ["PAID_SERVICE", "FREE_SERVICE", "ACCIDENT"],
+      required: true,
+    },
+
+    //addition by advisor
     priority: {
       type: String,
       enum: ["LOW", "NORMAL", "HIGH", "EMERGENCY"],
@@ -95,6 +100,7 @@ const vehicleEntrySchema = new mongoose.Schema(
       type: Number,
     },
 
+    //status tracking
     currentStatus: {
       type: String,
       enum: [
@@ -118,6 +124,7 @@ const vehicleEntrySchema = new mongoose.Schema(
       ref: "User",
     },
 
+    //rework details
     reworkReason: {
       type: String,
     },
