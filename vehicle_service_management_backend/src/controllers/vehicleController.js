@@ -4,13 +4,36 @@ const User = require("../models/User");
 const { calculateTimes } = require("../utils/timeCalculator");
 
 exports.checkInVehicle = asyncHandler(async (req, res) => {
-  const { customerName, phone, vehicleNumber, vehicleModel, checkInTime } =
-    req.body;
+
+  const data = { ...req.body };
+  for (const key in data) {
+    if (data[key] === "") data[key] = undefined;
+  }
+  let {
+    customerName,
+    phone,
+    vehicleNumber,
+    vehicleModel,
+    checkInTime,
+    serviceType,
+    vehicleBrand,
+    fuelType,
+    priority,
+    paymentStatus,
+    isInsuranceJob,
+    estimatedCost,
+  } = data;
 
   if (!customerName || !phone || !vehicleNumber || !vehicleModel) {
     res.status(400);
-    throw new Error("Required fields are missing");
+    throw new Error("Basic required fields missing");
   }
+
+   if (!serviceType) {
+    res.status(400);
+    throw new Error("Service type is required");
+  }
+
 
   const vehicle = await VehicleEntry.create({
     customerName,
@@ -18,12 +41,15 @@ exports.checkInVehicle = asyncHandler(async (req, res) => {
     vehicleNumber,
     vehicleModel,
     checkInTime: checkInTime || undefined,
+    serviceType,
+    vehicleBrand,
+    fuelType,
+    priority,
+    paymentStatus,
+    isInsuranceJob,
+    estimatedCost,
     currentStatus: "CHECKED_IN",
-    statusHistory: [
-      {
-        status: "CHECKED_IN",
-      },
-    ],
+    statusHistory: [{ status: "CHECKED_IN" }],
   });
 
   res.status(201).json(vehicle);

@@ -65,6 +65,35 @@ const vehicleEntrySchema = new mongoose.Schema(
     vehicleModel: {
       type: String,
     },
+    serviceType: {
+      type: String,
+      enum: ["PAID_SERVICE", "FREE_SERVICE", "ACCIDENT"],
+      required: true,
+    },
+    vehicleBrand: {
+      type: String,
+    },
+    fuelType: {
+      type: String,
+      enum: ["PETROL", "DIESEL", "CNG", "EV", "HYBRID"],
+    },
+    priority: {
+      type: String,
+      enum: ["LOW", "NORMAL", "HIGH", "EMERGENCY"],
+      default: "NORMAL",
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "PARTIAL", "PAID"],
+      default: "PENDING",
+    },
+    isInsuranceJob: {
+      type: Boolean,
+      default: false,
+    },
+    estimatedCost: {
+      type: Number,
+    },
 
     currentStatus: {
       type: String,
@@ -101,7 +130,7 @@ const vehicleEntrySchema = new mongoose.Schema(
     lastReworkAt: {
       type: Date,
     },
-    
+
     jobs: [jobSchema],
 
     checkInTime: {
@@ -121,4 +150,3 @@ const vehicleEntrySchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("VehicleEntry", vehicleEntrySchema);
- 
