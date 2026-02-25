@@ -277,13 +277,7 @@ exports.completeRework = asyncHandler(async (req, res) => {
     throw new Error("Rework QC not completed");
   }
 
-  const { qcRemarks } = req.body;
-
   vehicle.currentStatus = "REWORK_DONE";
-
-  if (qcRemarks) {
-    vehicle.qcRemarks = qcRemarks;
-  }
 
   vehicle.statusHistory.push({
     status: "REWORK_DONE",

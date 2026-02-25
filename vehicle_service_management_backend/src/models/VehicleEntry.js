@@ -101,10 +101,6 @@ const vehicleEntrySchema = new mongoose.Schema(
     lastReworkAt: {
       type: Date,
     },
-
-    qcRemarks: {
-      type: String,
-    },
     
     jobs: [jobSchema],
 

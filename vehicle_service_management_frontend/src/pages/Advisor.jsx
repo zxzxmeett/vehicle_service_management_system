@@ -118,12 +118,9 @@ function Advisor() {
   };
 
   const completeRework = async (vehicleId) => {
-    const qcRemarks = prompt("QC remarks (optional):");
 
     try {
-      await api.patch(`/vehicles/${vehicleId}/rework-done`, {
-        qcRemarks,
-      });
+      await api.patch(`/vehicles/${vehicleId}/rework-done`,);
       fetchVehicles();
     } catch {
       setError("Failed to complete rework");
