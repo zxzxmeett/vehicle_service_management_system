@@ -5,13 +5,13 @@ const { checkInVehicle,assignAdvisor,updateVehicleStatus,getVehicleTimes,addJob 
 const { protect } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
 const upload = require("../middleware/uploadMiddleware");
-const { getVehiclesByStatus } = require("../controllers/vehicleController");
 const { getAssignedVehicles } = require("../controllers/vehicleController");
 const { getVehicleJobs } = require("../controllers/vehicleController");
 const { deliver } = require("../controllers/vehicleController");
 const { updateVehicleDetails } = require("../controllers/vehicleController");
 const {requestRework,startRework,sendReworkToQC,completeRework,} = require("../controllers/vehicleController");
 const { updatePaymentStatus } = require("../controllers/vehicleController");
+const { getVehicles } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -57,12 +57,12 @@ router.patch(
   updateVehicleDetails
 )
 
-router.get(
-  "/",
-  protect,
-  authorizeRoles("RECEPTIONIST", "ADMIN"),
-  getVehiclesByStatus
-);
+// router.get(
+//   "/",
+//   protect,
+//   authorizeRoles("RECEPTIONIST", "ADMIN"),
+//   getVehiclesByStatus
+// );
 
 router.get(
   "/assigned",
@@ -120,6 +120,14 @@ router.patch(
   protect,
   authorizeRoles("RECEPTIONIST"),
   deliver
+);
+
+//endpoint GET/vehicles
+router.get(
+  "/",
+  protect,
+  authorizeRoles("ADVISOR", "ADMIN"),
+  getVehicles
 );
 
 module.exports = router;

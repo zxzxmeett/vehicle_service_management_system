@@ -156,4 +156,14 @@ const vehicleEntrySchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+vehicleEntrySchema.index({ currentStatus: 1 });
+vehicleEntrySchema.index({ fuelType: 1 });
+vehicleEntrySchema.index({ serviceType: 1 });
+vehicleEntrySchema.index({ priority: 1 });
+vehicleEntrySchema.index({ isInsuranceJob: 1 });
+vehicleEntrySchema.index({ assignedAdvisor: 1 });
+vehicleEntrySchema.index({ createdAt: -1 });
+vehicleEntrySchema.index({ assignedAdvisor: 1, currentStatus: 1 });
+//1 - ascending order, -1 descending order
+
 module.exports = mongoose.model("VehicleEntry", vehicleEntrySchema);

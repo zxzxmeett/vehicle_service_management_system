@@ -192,26 +192,26 @@ exports.getVehicleTimes = asyncHandler(async (req, res) => {
 });
 
 // for receptionist and admin to filter vehicles by status
-exports.getVehiclesByStatus = asyncHandler(async (req, res) => {
-  const { status, isReceptionCompleted } = req.query;
+// exports.getVehiclesByStatus = asyncHandler(async (req, res) => {
+//   const { status, isReceptionCompleted } = req.query;
 
-  if (!status) {
-    res.status(400);
-    throw new Error("Status is required");
-  }
+//   if (!status) {
+//     res.status(400);
+//     throw new Error("Status is required");
+//   }
 
-  const filter = {
-    currentStatus: status,
-  };
+//   const filter = {
+//     currentStatus: status,
+//   };
 
-  // IMPORTANT: handle boolean query param properly
-  if (isReceptionCompleted !== undefined) {
-    filter.isReceptionCompleted = isReceptionCompleted === "true";
-  }
+//   // IMPORTANT: handle boolean query param properly
+//   if (isReceptionCompleted !== undefined) {
+//     filter.isReceptionCompleted = isReceptionCompleted === "true";
+//   }
 
-  const vehicles = await VehicleEntry.find(filter);
-  res.json(vehicles);
-});
+//   const vehicles = await VehicleEntry.find(filter);
+//   res.json(vehicles);
+// });
 
 // for advisor to get assigned vehicles
 exports.getAssignedVehicles = async (req, res) => {
@@ -406,5 +406,97 @@ exports.deliver = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// GET /vehicles
+// Advisor + Admin — filterable
+exports.getVehicles = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const {
+      status,
+      fuelType,
+      serviceType,
+      priority,
+      isInsuranceJob,
+      date,
+    } = req.query;
+
+    const query = {};
+
+    // ROLE-BASED RESTRICTION
+    if (user.role === "ADVISOR") {
+      query.assignedAdvisor = user._id;
+    }
+
+    // STATUS FILTER (multi)
+    if (status) {
+      const statusArray = status.split(",");
+      query.currentStatus = { $in: statusArray };
+    }
+
+    // FUEL TYPE FILTER
+    if (fuelType) {
+      const fuelArray = fuelType.split(",");
+      query.fuelType = { $in: fuelArray };
+    }
+
+    //  SERVICE TYPE FILTER
+    if (serviceType) {
+      const serviceArray = serviceType.split(",");
+      query.serviceType = { $in: serviceArray };
+    }
+
+    //  PRIORITY FILTER
+    if (priority) {
+      const priorityArray = priority.split(",");
+      query.priority = { $in: priorityArray };
+    }
+
+    //  INSURANCE JOB FILTER
+    if (isInsuranceJob !== undefined) {
+      query.isInsuranceJob = isInsuranceJob === "true";
+    }
+
+    //  DATE FILTER (createdAt)
+    if (date) {
+      const now = new Date();
+
+      const startOfToday = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      );
+
+      if (date === "today") {
+        query.createdAt = {
+          $gte: startOfToday,
+          $lte: now,
+        };
+      } else if (date === "older") {
+        query.createdAt = {
+          $lt: startOfToday,
+        };
+      }
+    }
+
+    // EXECUTE QUERY
+    const vehicles = await VehicleEntry.find(query)
+      .populate("assignedAdvisor", "name email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: vehicles.length,
+      data: vehicles,
+    });
+  } catch (error) {
+    console.error("Get Vehicles Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching vehicles",
+    });
   }
 };
