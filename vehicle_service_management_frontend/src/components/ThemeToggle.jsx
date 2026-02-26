@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 function ThemeToggle() {
   const [theme, setTheme] = useState(() =>
     typeof window !== "undefined"
-      ? localStorage.getItem("theme") || "dark"
-      : "dark",
+      ? localStorage.getItem("theme") || "light"
+      : "light",
   );
 
   useEffect(() => {
@@ -21,7 +21,10 @@ function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="btn"
+      className="h-9 rounded-md px-3 text-sm font-medium transition
+      border border-slate-300 dark:border-slate-700
+      text-slate-700 dark:text-slate-300
+      hover:bg-slate-200 dark:hover:bg-slate-800"
       aria-label={
         theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
       }

@@ -8,6 +8,9 @@ import Advisor from "./pages/Advisor.jsx";
 import ProtectedRoute from "./utlis/ProtectedRoute.jsx";
 import CreateUser from "./pages/createUser.jsx";  
 import ReceptionDelivery from "./pages/ReceptionDelivery.jsx";
+import AdminLayout from "./pages/AdminLayout.jsx";
+import AdminInsights from "./pages/AdminInsights.jsx";
+import ManageUsers from "./pages/ManageUser.jsx";
 
 function App() {
   console.log("API URL:", import.meta.env.VITE_API_URL);
@@ -15,9 +18,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route path="/" element={<Login />} />
-        <Route path="/admin" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Admin /></ProtectedRoute>} />
-        <Route path="/admin/create-user" element={<ProtectedRoute allowedRoles={["ADMIN"]}><CreateUser /></ProtectedRoute>} />
+
+        <Route path="/admin" element={<ProtectedRoute allowedRoles={["ADMIN"]}><AdminLayout /></ProtectedRoute>}>
+        <Route index element={<Admin />} />
+        <Route path="create-user" element={<CreateUser />} />
+        <Route path="insights" element={<AdminInsights />} />
+        <Route path="users" element={<ManageUsers />} />
+        </Route>
+
         <Route path="/security" element={<ProtectedRoute allowedRoles={["SECURITY"]}><Security /></ProtectedRoute>} />
         <Route path="/reception" element={<ProtectedRoute allowedRoles={["RECEPTIONIST"]}><Reception /></ProtectedRoute>} />
         <Route path="/reception/delivery" allowedRoles={["RECEPTIONIST"]} element={<ReceptionDelivery />} />

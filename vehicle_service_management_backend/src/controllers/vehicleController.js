@@ -422,10 +422,20 @@ exports.getVehicles = async (req, res) => {
       priority,
       isInsuranceJob,
       date,
+      advisorId,
+      paymentStatus,
     } = req.query;
 
     const query = {};
 
+    if (advisorId) {
+      query.assignedAdvisor = advisorId;
+    }
+    
+    if (paymentStatus) {
+      const paymentArray = paymentStatus.split(",");
+      query.paymentStatus = { $in: paymentArray };
+    }
     // ROLE-BASED RESTRICTION
     if (user.role === "ADVISOR") {
       query.assignedAdvisor = user._id;
