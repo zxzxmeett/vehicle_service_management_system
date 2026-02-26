@@ -12,6 +12,7 @@ const { updateVehicleDetails } = require("../controllers/vehicleController");
 const {requestRework,startRework,sendReworkToQC,completeRework,} = require("../controllers/vehicleController");
 const { updatePaymentStatus } = require("../controllers/vehicleController");
 const { getVehicles } = require("../controllers/vehicleController");
+const { getVehiclesByStatus } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -57,12 +58,12 @@ router.patch(
   updateVehicleDetails
 )
 
-// router.get(
-//   "/",
-//   protect,
-//   authorizeRoles("RECEPTIONIST", "ADMIN"),
-//   getVehiclesByStatus
-// );
+router.get(
+  "/",
+  protect,
+  authorizeRoles("RECEPTIONIST", "ADMIN"),
+  getVehiclesByStatus
+);
 
 router.get(
   "/assigned",
@@ -124,9 +125,9 @@ router.patch(
 
 //endpoint GET/vehicles
 router.get(
-  "/",
+  "/filter",
   protect,
-  authorizeRoles("ADVISOR", "ADMIN"),
+  authorizeRoles("ADVISOR", "ADMIN", "RECEPTIONIST"),
   getVehicles
 );
 

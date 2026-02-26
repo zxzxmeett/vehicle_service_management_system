@@ -10,6 +10,78 @@ function Advisor() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [dragActive, setDragActive] = useState(false);
+  const [filters, setFilters] = useState({
+    date: "",
+    status: [],
+    fuelType: [],
+    serviceType: [],
+    priority: [],
+    isInsuranceJob: null,
+  });
+
+  const handleFilterArray = (key, value) => {
+    setFilters((prev) => {
+      const exists = prev[key].includes(value);
+
+      return {
+        ...prev,
+        [key]: exists
+          ? prev[key].filter((v) => v !== value)
+          : [...prev[key], value],
+      };
+    });
+  };
+
+  const handleFilterSingle = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const fetchVehicles = async () => {
+    try {
+      const params = new URLSearchParams();
+
+      if (filters.date) params.append("date", filters.date);
+
+      if (filters.status.length)
+        params.append("status", filters.status.join(","));
+
+      if (filters.fuelType.length)
+        params.append("fuelType", filters.fuelType.join(","));
+
+      if (filters.serviceType.length)
+        params.append("serviceType", filters.serviceType.join(","));
+
+      if (filters.priority.length)
+        params.append("priority", filters.priority.join(","));
+
+      if (filters.isInsuranceJob !== null)
+        params.append("isInsuranceJob", filters.isInsuranceJob);
+
+      const res = await api.get(`/vehicles/filter?${params.toString()}`);
+
+      setVehicles(res.data.data); // matches your controller
+    } catch (err) {
+      setError("Failed to fetch vehicles");
+    }
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [filters]);
+
+  const clearFilters = () => {
+    setFilters({
+      date: "",
+      status: [],
+      fuelType: [],
+      serviceType: [],
+      priority: [],
+      isInsuranceJob: null,
+    });
+  };
 
   const statuses = ["IN_SERVICE", "QC_PENDING", "READY_FOR_DELIVERY"];
   const reworkStatuses = ["REWORK_REQUESTED", "IN_REWORK", "REWORK_QC_PENDING"];
@@ -45,18 +117,6 @@ function Advisor() {
       setError("Failed to update details");
     }
   };
-  const fetchVehicles = async () => {
-    try {
-      const res = await api.get("/vehicles/assigned");
-      setVehicles(res.data);
-    } catch (err) {
-      setError("Failed to fetch vehicles");
-    }
-  };
-
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
 
   const updateStatus = async (vehicleId) => {
     if (!selectedStatus[vehicleId]) {
@@ -201,6 +261,153 @@ function Advisor() {
 
         {/* ===== Main Grid ===== */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* ===== LEFT FILTER SIDEBAR ===== */}
+          <aside className="lg:col-span-1">
+            <div
+              className="sticky top-20 rounded-xl bg-white dark:bg-[#121a2a]
+      shadow-sm ring-1 ring-slate-200 dark:ring-[#243047] p-5 space-y-6"
+            >
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                Filters
+              </h2>
+
+              {/* ===== DATE ===== */}
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+                  Date
+                </p>
+
+                <div className="space-y-2 text-sm">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="date"
+                      checked={filters.date === "today"}
+                      onChange={() => handleFilterSingle("date", "today")}
+                    />
+                    Today
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="date"
+                      checked={filters.date === "older"}
+                      onChange={() => handleFilterSingle("date", "older")}
+                    />
+                    Older
+                  </label>
+                </div>
+              </div>
+
+              {/* ===== STATUS ===== */}
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+                  Status
+                </p>
+
+                <div className="space-y-2 text-sm max-h-40 overflow-y-auto">
+                  {[
+                    "IN_SERVICE",
+                    "QC_PENDING",
+                    "READY_FOR_DELIVERY",
+                    "REWORK_REQUESTED",
+                    "IN_REWORK",
+                    "REWORK_QC_PENDING",
+                  ].map((s) => (
+                    <label key={s} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={filters.status.includes(s)}
+                        onChange={() => handleFilterArray("status", s)}
+                      />
+                      {s.replaceAll("_", " ")}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* ===== FUEL TYPE ===== */}
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+                  Fuel Type
+                </p>
+
+                <div className="space-y-2 text-sm">
+                  {["PETROL", "DIESEL", "CNG", "EV", "HYBRID"].map((f) => (
+                    <label key={f} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={filters.fuelType.includes(f)}
+                        onChange={() => handleFilterArray("fuelType", f)}
+                      />
+                      {f}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* ===== PRIORITY ===== */}
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+                  Priority
+                </p>
+
+                <div className="space-y-2 text-sm">
+                  {["LOW", "NORMAL", "HIGH", "EMERGENCY"].map((p) => (
+                    <label key={p} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={filters.priority.includes(p)}
+                        onChange={() => handleFilterArray("priority", p)}
+                      />
+                      {p}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* ===== INSURANCE ===== */}
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+                  Insurance Job
+                </p>
+
+                <div className="space-y-2 text-sm">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={filters.isInsuranceJob === true}
+                      onChange={() =>
+                        handleFilterSingle("isInsuranceJob", true)
+                      }
+                    />
+                    Yes
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={filters.isInsuranceJob === false}
+                      onChange={() =>
+                        handleFilterSingle("isInsuranceJob", false)
+                      }
+                    />
+                    No
+                  </label>
+                </div>
+              </div>
+
+              {/* ===== CLEAR BUTTON ===== */}
+              <button
+                onClick={clearFilters}
+                className="w-full h-10 rounded-md bg-slate-900 dark:bg-slate-700
+        text-sm font-medium text-white hover:bg-slate-800"
+              >
+                Clear Filters
+              </button>
+            </div>
+          </aside>
           {/* ===== Vehicles Column ===== */}
           <div className="lg:col-span-3 space-y-6">
             {vehicles
@@ -285,7 +492,7 @@ function Advisor() {
                         </>
                       )}
 
-                      {/* 🔥 Rework Actions (ALWAYS checked separately) */}
+                      {/* Rework Actions (ALWAYS checked separately) */}
 
                       {vehicle.currentStatus === "REWORK_REQUESTED" && (
                         <button
@@ -484,23 +691,6 @@ function Advisor() {
                 </div>
               ))}
           </div>
-
-          {/* ===== Guidelines Panel ===== */}
-          <aside
-            className="lg:col-span-1 h-fit sticky top-20 rounded-xl bg-white dark:bg-[#121a2a]
-          p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]"
-          >
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
-              Advisor Guidelines
-            </h3>
-
-            <ul className="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-400">
-              <li>Update status as work progresses</li>
-              <li>Add all jobs before QC stage</li>
-              <li>Include estimated time</li>
-              <li>Upload job cards when required</li>
-            </ul>
-          </aside>
         </div>
       </main>
     </div>

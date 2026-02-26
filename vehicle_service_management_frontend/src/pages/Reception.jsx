@@ -18,7 +18,7 @@ function Reception() {
     try {
       const res = await api.get("/vehicles?status=CHECKED_IN");
       setVehicles(res.data);
-    } catch {
+    } catch (err) {
       setError("Failed to fetch vehicles");
     }
   };

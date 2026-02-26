@@ -192,26 +192,26 @@ exports.getVehicleTimes = asyncHandler(async (req, res) => {
 });
 
 // for receptionist and admin to filter vehicles by status
-// exports.getVehiclesByStatus = asyncHandler(async (req, res) => {
-//   const { status, isReceptionCompleted } = req.query;
+exports.getVehiclesByStatus = asyncHandler(async (req, res) => {
+  const { status, isReceptionCompleted } = req.query;
 
-//   if (!status) {
-//     res.status(400);
-//     throw new Error("Status is required");
-//   }
+  if (!status) {
+    res.status(400);
+    throw new Error("Status is required");
+  }
 
-//   const filter = {
-//     currentStatus: status,
-//   };
+  const filter = {
+    currentStatus: status,
+  };
 
-//   // IMPORTANT: handle boolean query param properly
-//   if (isReceptionCompleted !== undefined) {
-//     filter.isReceptionCompleted = isReceptionCompleted === "true";
-//   }
+  // IMPORTANT: handle boolean query param properly
+  if (isReceptionCompleted !== undefined) {
+    filter.isReceptionCompleted = isReceptionCompleted === "true";
+  }
 
-//   const vehicles = await VehicleEntry.find(filter);
-//   res.json(vehicles);
-// });
+  const vehicles = await VehicleEntry.find(filter);
+  res.json(vehicles);
+});
 
 // for advisor to get assigned vehicles
 exports.getAssignedVehicles = async (req, res) => {

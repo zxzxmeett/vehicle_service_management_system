@@ -19,7 +19,7 @@ function ReceptionDelivery() {
       ]);
 
       setVehicles([...readyRes.data, ...reworkRes.data]);
-    } catch {
+    } catch (err) {
       setError("Failed to fetch vehicles");
     }
   };
@@ -31,34 +31,33 @@ function ReceptionDelivery() {
     }));
   };
 
-  const updatePaymentStatus = async (vehicleId) => {
-    const selected = paymentSelection[vehicleId];
+ const updatePaymentStatus = async (vehicleId) => {
+  const selected = paymentSelection[vehicleId];
 
-    if (!selected) {
-      setError("Please select payment status");
-      return;
-    }
+  if (!selected) {
+    setError("Please select payment status");
+    return;
+  }
+
+  try {
+    await api.patch(`/vehicles/${vehicleId}/payment`, {
+      paymentStatus: selected,
+    });
+
+    setMessage("Payment status updated");
+    setError("");
 
     try {
-      await api.patch(`/vehicles/${vehicleId}/payment`, {
-        paymentStatus: selected,
-      });
-
-      setMessage("Payment status updated");
-      setError("");
-
-      // Wrap refresh separately
-      try {
-        await fetchVehicles();
-      } catch {
-        console.warn("Refresh failed, but update succeeded");
-      }
-    } catch (err) {
-      setError(
-        err.response?.data?.message || "Failed to update payment status",
-      );
+      await fetchVehicles();
+    } catch {
+      console.warn("Refresh failed, but update succeeded");
     }
-  };
+  } catch (err) {
+    setError(
+      err.response?.data?.message || "Failed to update payment status"
+    );
+  }
+};
 
   const sendForRework = async (vehicleId) => {
     const reason = prompt("Enter reason for rework:");
