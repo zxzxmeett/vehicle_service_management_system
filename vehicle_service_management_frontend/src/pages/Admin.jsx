@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-import LogoutButton from "../components/LogoutButton";
-import ThemeToggle from "../components/ThemeToggle";
+// Dasboard for admin
 
 function Admin() {
-  const navigate = useNavigate();
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
-  const [jobsMap, setJobsMap] = useState({});
-  const [activeVehicleId, setActiveVehicleId] = useState(null);
 
   const fetchDailyReport = async () => {
     try {
@@ -23,16 +19,6 @@ function Admin() {
   useEffect(() => {
     fetchDailyReport();
   }, []);
-
-  const fetchJobs = async (vehicleId) => {
-    try {
-      const res = await api.get(`/vehicles/${vehicleId}/jobs`);
-      setJobsMap((prev) => ({ ...prev, [vehicleId]: res.data }));
-      setActiveVehicleId(vehicleId);
-    } catch {
-      setError("Failed to load jobs");
-    }
-  };
 
   const STATUS = {
     IN_SERVICE: "IN_SERVICE",

@@ -48,3 +48,80 @@ exports.getDailyReport = asyncHandler(async (req, res) => {
     vehicles: report,
   });
 });
+
+exports.getSummaryReport = asyncHandler(async (req, res) => {
+  const range = req.query.range || "30d";
+
+  const now = new Date();
+  const IST_OFFSET = 330 * 60 * 1000;
+  const istNow = new Date(now.getTime() + IST_OFFSET);
+
+  let startOfRange;
+
+  if (range === "month") {
+    // Start of current month (IST)
+    startOfRange = new Date(istNow.getFullYear(), istNow.getMonth(), 1);
+  } else {
+    // Last 30 days
+    startOfRange = new Date(istNow);
+    startOfRange.setDate(startOfRange.getDate() - 30);
+  }
+
+  startOfRange.setHours(0, 0, 0, 0);
+
+  const startUTC = new Date(startOfRange.getTime() - IST_OFFSET);
+  const endUTC = new Date(istNow.getTime() - IST_OFFSET);
+
+  const matchStage = {
+    createdAt: { $gte: startUTC, $lte: endUTC },
+  };
+
+  //  Status counts
+  const statusCounts = await VehicleEntry.aggregate([
+    { $match: matchStage },
+    { $group: { _id: "$currentStatus", count: { $sum: 1 } } },
+  ]);
+
+  //  Service type counts
+  const serviceTypeCounts = await VehicleEntry.aggregate([
+    { $match: matchStage },
+    { $group: { _id: "$serviceType", count: { $sum: 1 } } },
+  ]);
+
+  //  Payment status counts (optional but useful)
+  const paymentCounts = await VehicleEntry.aggregate([
+    { $match: matchStage },
+    { $group: { _id: "$paymentStatus", count: { $sum: 1 } } },
+  ]);
+
+  //  Overall KPIs
+  const totals = await VehicleEntry.aggregate([
+    { $match: matchStage },
+    {
+      $group: {
+        _id: null,
+        totalVehicles: { $sum: 1 },
+        totalEstimatedRevenue: { $sum: "$estimatedCost" },
+        insuranceJobs: {
+          $sum: { $cond: ["$isInsuranceJob", 1, 0] },
+        },
+      },
+    },
+  ]);
+
+  res.json({
+    range,
+    periodStart: startOfRange,
+    periodEnd: istNow,
+
+    totals: totals[0] || {
+      totalVehicles: 0,
+      totalEstimatedRevenue: 0,
+      insuranceJobs: 0,
+    },
+
+    statusCounts,
+    serviceTypeCounts,
+    paymentCounts,
+  });
+});
