@@ -31,7 +31,7 @@ function AdminInsights() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-10 pb-8 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-1 pb-8 transition-colors duration-300">
       <div className="mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div className="mb-10 flex items-center justify-between">
