@@ -1,175 +1,204 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { PaperClipIcon } from "@heroicons/react/24/outline";
 
-function AdminInsights() {
+function VehicleInsights() {
   const [vehicles, setVehicles] = useState([]);
-  const [jobsMap, setJobsMap] = useState({});
-  const [activeVehicleId, setActiveVehicleId] = useState(null);
+  const [jobs, setJobs] = useState([]);
   const [error, setError] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
-  const fetchVehicles = async () => {
+  const openJobs = async (vehicle) => {
     try {
-      const res = await api.get("/reports/daily");
-      setVehicles(res.data.vehicles || []);
-    } catch {
-      setError("Failed to load vehicles");
+      console.log("Vehicle clicked:", vehicle);
+
+      const res = await api.get(`/vehicles/${vehicle._id}/jobs`);
+
+      console.log("API response:", res);
+      console.log("Response data:", res.data);
+
+      setJobs(res.data || []);
+      setSelectedVehicle(vehicle);
+      setShowModal(true);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load jobs");
+    }
+  };
+
+  const fetchVehicleInsights = async () => {
+    try {
+      const res = await api.get("/reports/vehicle-insights");
+      setVehicles(res.data);
+    } catch (err) {
+      setError("Failed to load vehicle insights");
     }
   };
 
   useEffect(() => {
-    fetchVehicles();
+    fetchVehicleInsights();
   }, []);
 
-  const fetchJobs = async (vehicleId) => {
-    try {
-      const res = await api.get(`/vehicles/${vehicleId}/jobs`);
-      setJobsMap((prev) => ({ ...prev, [vehicleId]: res.data }));
-      setActiveVehicleId(vehicleId);
-    } catch {
-      setError("Failed to load jobs");
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-1 pb-8 transition-colors duration-300">
-      <div className="mx-auto max-w-6xl space-y-8">
-        {/* Header */}
-        <div className="mb-10 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-[#e6eef6]">
-              Vehicle Service Insights
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-[#9fb0c3]">
-              Monitor vehicle statuses and job details in real-time.
-            </p>
-          </div>
+    <div className="p-6 text-gray-800 dark:text-gray-100">
+      <h2 className="text-2xl font-semibold mb-6">
+        Vehicle Service Insights — Last 30 Days
+      </h2>
+
+      {/* Table */}
+      <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-100 dark:bg-gray-800">
+            <tr>
+              <th className="px-4 py-3 text-left">Vehicle</th>
+              <th className="px-4 py-3 text-left">Customer</th>
+              <th className="px-4 py-3 text-left">Service</th>
+              <th className="px-4 py-3 text-left">Status</th>
+              <th className="px-4 py-3 text-left">Idle</th>
+              <th className="px-4 py-3 text-left">Jobs</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {vehicles.map((v) => (
+              <tr
+                key={v._id}
+                className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+              >
+                <td className="px-4 py-3 font-medium">{v.vehicleNumber}</td>
+                <td className="px-4 py-3">{v.customerName}</td>
+                <td className="px-4 py-3">{v.serviceType}</td>
+                <td className="px-4 py-3">{v.status}</td>
+                <td className="px-4 py-3">{v.idleTime ?? "-"}</td>
+
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => openJobs(v)}
+                    className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                  >
+                    View Jobs ({v.jobCount})
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center
+                  bg-black/50 backdrop-blur-sm p-4">
+
+    <div className="w-full max-w-2xl
+                    bg-white dark:bg-gray-900
+                    text-gray-800 dark:text-gray-100
+                    rounded-2xl shadow-2xl
+                    border border-gray-200 dark:border-gray-700
+                    overflow-hidden">
+
+      {/* Header */}
+      <div className="flex items-center justify-between
+                      px-6 py-4
+                      border-b border-gray-200 dark:border-gray-700">
+
+        <div>
+          <h3 className="text-xl font-semibold">
+            Job Cards
+          </h3>
+          <p className="text-sm text-gray-500">
+            Vehicle — {selectedVehicle?.vehicleNumber}
+          </p>
         </div>
 
-        {/* Error / Loading */}
-        {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-400">
-            {error}
+        <button
+          onClick={() => setShowModal(false)}
+          className="p-2 rounded-lg
+                     hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="max-h-[60vh] overflow-y-auto p-6 space-y-4">
+
+        {jobs.length === 0 ? (
+          <div className="text-center text-gray-500 py-10">
+            No jobs found for this vehicle
           </div>
-        )}
+        ) : (
+          jobs.map((job, i) => (
+            <div
+              key={i}
+              className="p-4 rounded-xl
+                         bg-gray-50 dark:bg-gray-800
+                         border border-gray-200 dark:border-gray-700
+                         hover:shadow-md transition"
+            >
 
-        {/* Vehicles Table */}
-        <div className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
-          <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-white">
-            Vehicles
-          </h2>
+              {/* Top Row */}
+              <div className="flex items-start justify-between gap-4">
 
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500 dark:text-[#9fb0c3]">
-                  <th className="py-2">Vehicle</th>
-                  <th>Status</th>
-                  <th>Service Time</th>
-                  <th>Idle Time</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {vehicles.map((v) => (
-                  <tr
-                    key={v.vehicleId}
-                    className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                <div>
+                  <p className="font-semibold">
+                    {job.description}
+                  </p>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Estimated: {job.estimatedTimeInMinutes} min
+                  </p>
+
+                  <p className="text-xs text-gray-400 mt-1">
+                    Added: {new Date(job.addedAt).toLocaleString()}
+                  </p>
+                </div>
+
+                {/* File Icon */}
+                {job.file && (
+                  <a
+                    href={`http://localhost:5000/${job.file}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0
+                               p-2 rounded-lg
+                               bg-gray-200 dark:bg-gray-700
+                               hover:bg-blue-100 dark:hover:bg-blue-900
+                               transition"
+                    title="Open attachment"
                   >
-                    <td className="py-2 font-medium text-slate-900 dark:text-white">
-                      {v.vehicleNumber}
-                    </td>
-                    <td className="text-slate-700 dark:text-[#9fb0c3]">
-                      {v.currentStatus}
-                    </td>
-                    <td className="text-slate-700 dark:text-[#9fb0c3]">
-                      {v.serviceTimeInMinutes} min
-                    </td>
-                    <td className="text-slate-700 dark:text-[#9fb0c3]">
-                      {v.idleTimeInMinutes} min
-                    </td>
-                    <td className="text-right">
-                      <button
-                        onClick={() => fetchJobs(v.vehicleId)}
-                        className="rounded-md px-3 py-1 text-sm text-slate-700 dark:text-[#9fb0c3]
-                               hover:bg-slate-200 dark:hover:bg-slate-700"
-                      >
-                        View Jobs
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {/* Jobs Panel */}
-        {/* Updated Jobs Panel Section in Admin.jsx */}
-        {activeVehicleId && jobsMap[activeVehicleId] && (
-          <div className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
-            <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-[#e6eef6]">
-              Jobs for Vehicle
-            </h2>
+                    <PaperClipIcon className="w-5 h-5" />
+                  </a>
+                )}
+              </div>
 
-            {jobsMap[activeVehicleId].length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                No jobs found.
-              </p>
-            ) : (
-              <ul className="space-y-3">
-                {jobsMap[activeVehicleId].map((job, i) => (
-                  <li
-                    key={i}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg bg-slate-50 dark:bg-slate-800/50 p-4 border border-transparent dark:border-slate-700"
-                  >
-                    <div>
-                      <div className="font-medium text-slate-900 dark:text-[#e6eef6]">
-                        {job.description}
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        Estimated Time: {job.estimatedTimeInMinutes || "--"}{" "}
-                        mins
-                      </div>
-                    </div>
-
-                    {/* Verification: Link only renders if job.file exists */}
-                    {job.file ? (
-                      <div className="mt-3 sm:mt-0">
-                        <a
-                          href={`http://localhost:5000/${job.file}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-2 rounded-md bg-white dark:bg-slate-700 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition"
-                        >
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                          View Job Card
-                        </a>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-slate-400 italic">
-                        No attachment
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+            </div>
+          ))
         )}
       </div>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t
+                      border-gray-200 dark:border-gray-700
+                      bg-gray-50 dark:bg-gray-800/50">
+
+        <button
+          onClick={() => setShowModal(false)}
+          className="w-full py-2.5 rounded-lg
+                     bg-blue-600 text-white
+                     hover:bg-blue-700 transition
+                     font-medium"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
 
-export default AdminInsights;
+export default VehicleInsights;

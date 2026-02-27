@@ -9,7 +9,7 @@ import ProtectedRoute from "./utlis/ProtectedRoute.jsx";
 import CreateUser from "./pages/createUser.jsx";  
 import ReceptionDelivery from "./pages/ReceptionDelivery.jsx";
 import AdminLayout from "./pages/AdminLayout.jsx";
-import AdminInsights from "./pages/AdminInsights.jsx";
+import VehicleInsights from "./pages/AdminInsights.jsx";
 import ManageUsers from "./pages/ManageUser.jsx";
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute allowedRoles={["ADMIN"]}><AdminLayout /></ProtectedRoute>}>
         <Route index element={<Admin />} />
         <Route path="create-user" element={<CreateUser />} />
-        <Route path="insights" element={<AdminInsights />} />
+        <Route path="insights" element={<VehicleInsights />} />
         <Route path="users" element={<ManageUsers />} />
         </Route>
 

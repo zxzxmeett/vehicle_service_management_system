@@ -125,3 +125,54 @@ exports.getSummaryReport = asyncHandler(async (req, res) => {
     paymentCounts,
   });
 });
+
+exports.getVehicleInsights = async (req, res) => {
+  try {
+    const { from, to } = req.query;
+
+    // Default = last 30 days
+    const endDate = to ? new Date(to) : new Date();
+    const startDate = from
+      ? new Date(from)
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const vehicles = await VehicleEntry.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+    })
+      .select(
+        "vehicleNumber customerName serviceType status idleTime jobs createdAt deliveryDate paymentStatus",
+      )
+      .sort({ createdAt: -1 });
+
+    // Send lightweight response (no full job details)
+    const now = new Date();
+
+    const response = vehicles.map((v) => {
+      let status = "In Service";
+
+      if (v.deliveryDate) status = "Delivered";
+      else if (v.paymentStatus === "PAID") status = "Ready";
+
+      return {
+        _id: v._id,
+        vehicleNumber: v.vehicleNumber,
+        customerName: v.customerName,
+        serviceType: v.serviceType,
+        status,
+        idleTime: v.createdAt
+          ? ((now - new Date(v.createdAt)) / (1000 * 60 * 60)).toFixed(1) +
+            " hrs"
+          : "-",
+        jobCount: v.jobs?.length || 0,
+        inDate: v.createdAt,
+        deliveryDate: v.deliveryDate,
+        paymentStatus: v.paymentStatus,
+      };
+    });
+
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch vehicle insights" });
+  }
+};
