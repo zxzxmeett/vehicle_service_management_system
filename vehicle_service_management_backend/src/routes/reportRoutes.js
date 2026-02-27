@@ -5,6 +5,7 @@ const { getDailyReport } = require("../controllers/reportController");
 const { getSummaryReport } = require("../controllers/reportController");
 const { protect } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
+const { getVehicleInsights } = require("../controllers/vehicleController");
 
 router.get(
   "/daily",
@@ -18,5 +19,12 @@ router.get(
   protect,
   authorizeRoles("ADMIN"),
   getSummaryReport
+);
+
+router.get(
+  "/vehicle-insights",
+  protect,
+  authorizeRoles("ADMIN"),
+  getVehicleInsights
 );
 module.exports = router;

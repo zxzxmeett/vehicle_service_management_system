@@ -233,6 +233,45 @@ exports.getVehicleJobs = async (req, res) => {
   res.json(vehicle.jobs);
 };
 
+exports.getVehicleInsights = async (req, res) => {
+  try {
+    const { from, to } = req.query;
+
+    // Default = last 30 days
+    const endDate = to ? new Date(to) : new Date();
+    const startDate = from
+      ? new Date(from)
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const vehicles = await VehicleEntry.find({
+      createdAt: { $gte: startDate, $lte: endDate }
+    })
+      .select(
+        "vehicleNumber customerName serviceType status idleTime jobs createdAt deliveryDate paymentStatus"
+      )
+      .sort({ createdAt: -1 });
+
+    // Send lightweight response (no full job details)
+    const response = vehicles.map(v => ({
+      _id: v._id,
+      vehicleNumber: v.vehicleNumber,
+      customerName: v.customerName,
+      serviceType: v.serviceType,
+      status: v.status,
+      idleTime: v.idleTime,
+      jobCount: v.jobs?.length || 0,
+      inDate: v.createdAt,
+      deliveryTime: v.deliveryTime,
+      paymentStatus: v.paymentStatus
+    }));
+
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch vehicle insights" });
+  }
+};
+
 exports.requestRework = asyncHandler(async (req, res) => {
   const vehicle = await VehicleEntry.findById(req.params.id);
 
