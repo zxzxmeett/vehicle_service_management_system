@@ -31,65 +31,77 @@ function AdminInsights() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
-        Vehicle Insights
-      </h1>
-
-      {error && (
-        <div className="text-red-500 text-sm">{error}</div>
-      )}
-
-      {/* Vehicles Table */}
-      <div className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
-        <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-white">
-          Vehicles
-        </h2>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500 dark:text-[#9fb0c3]">
-                <th className="py-2">Vehicle</th>
-                <th>Status</th>
-                <th>Service Time</th>
-                <th>Idle Time</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {vehicles.map((v) => (
-                <tr
-                  key={v.vehicleId}
-                  className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                >
-                  <td className="py-2 font-medium text-slate-900 dark:text-white">
-                    {v.vehicleNumber}
-                  </td>
-                  <td className="text-slate-700 dark:text-[#9fb0c3]">
-                    {v.currentStatus}
-                  </td>
-                  <td className="text-slate-700 dark:text-[#9fb0c3]">
-                    {v.serviceTimeInMinutes} min
-                  </td>
-                  <td className="text-slate-700 dark:text-[#9fb0c3]">
-                    {v.idleTimeInMinutes} min
-                  </td>
-                  <td className="text-right">
-                    <button
-                      onClick={() => fetchJobs(v.vehicleId)}
-                      className="rounded-md px-3 py-1 text-sm text-slate-700 dark:text-[#9fb0c3]
-                               hover:bg-slate-200 dark:hover:bg-slate-700"
-                    >
-                      View Jobs
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] px-6 pt-10 pb-8 transition-colors duration-300">
+      <div className="mx-auto max-w-6xl space-y-8">
+        {/* Header */}
+        <div className="mb-10 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-[#e6eef6]">
+              Vehicle Service Insights
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-[#9fb0c3]">
+              Monitor vehicle statuses and job details in real-time.
+            </p>
+          </div>
         </div>
-      </div>
+
+        {/* Error / Loading */}
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-400">
+            {error}
+          </div>
+        )}
+
+        {/* Vehicles Table */}
+        <div className="rounded-xl bg-white dark:bg-[#121a2a] p-6 shadow-sm ring-1 ring-slate-200 dark:ring-[#243047]">
+          <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-white">
+            Vehicles
+          </h2>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500 dark:text-[#9fb0c3]">
+                  <th className="py-2">Vehicle</th>
+                  <th>Status</th>
+                  <th>Service Time</th>
+                  <th>Idle Time</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {vehicles.map((v) => (
+                  <tr
+                    key={v.vehicleId}
+                    className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  >
+                    <td className="py-2 font-medium text-slate-900 dark:text-white">
+                      {v.vehicleNumber}
+                    </td>
+                    <td className="text-slate-700 dark:text-[#9fb0c3]">
+                      {v.currentStatus}
+                    </td>
+                    <td className="text-slate-700 dark:text-[#9fb0c3]">
+                      {v.serviceTimeInMinutes} min
+                    </td>
+                    <td className="text-slate-700 dark:text-[#9fb0c3]">
+                      {v.idleTimeInMinutes} min
+                    </td>
+                    <td className="text-right">
+                      <button
+                        onClick={() => fetchJobs(v.vehicleId)}
+                        className="rounded-md px-3 py-1 text-sm text-slate-700 dark:text-[#9fb0c3]
+                               hover:bg-slate-200 dark:hover:bg-slate-700"
+                      >
+                        View Jobs
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
         {/* Jobs Panel */}
         {/* Updated Jobs Panel Section in Admin.jsx */}
         {activeVehicleId && jobsMap[activeVehicleId] && (
@@ -155,6 +167,7 @@ function AdminInsights() {
             )}
           </div>
         )}
+      </div>
     </div>
   );
 }
