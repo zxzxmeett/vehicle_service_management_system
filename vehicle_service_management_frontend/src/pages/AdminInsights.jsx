@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { PaperClipIcon } from "@heroicons/react/24/outline";
+import InsightsFilterBar from "../components/insightFilterbar";
 
 function VehicleInsights() {
   const [vehicles, setVehicles] = useState([]);
@@ -8,6 +9,9 @@ function VehicleInsights() {
   const [error, setError] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [filters, setFilters] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [advisorList, setAdvisorList] = useState([]);
 
   const openJobs = async (vehicle) => {
     try {
@@ -26,7 +30,7 @@ function VehicleInsights() {
       alert("Failed to load jobs");
     }
   };
-
+  //table
   const fetchVehicleInsights = async () => {
     try {
       const res = await api.get("/reports/vehicle-insights");
@@ -40,11 +44,53 @@ function VehicleInsights() {
     fetchVehicleInsights();
   }, []);
 
+  //filtering
+  const fetchVehicles = async () => {
+    try {
+      setLoading(true);
+
+      const params = new URLSearchParams(filters).toString();
+
+      const res = await api.get(`/vehicles/vehicle-insights?${params}`);
+
+      setVehicles(res.data.data || res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch insights", err);
+      setError("Failed to fetch insights");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [filters]);
+
+  //fetch advisors for filter dropdown
+  const fetchAdvisors = async () => {
+    try {
+      const res = await api.get("/users?role=ADVISOR");
+      setAdvisorList(res.data || []);
+    } catch (err) {
+      console.error("Failed to load advisors", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdvisors();
+  }, []);
+
   return (
     <div className="p-6 text-gray-800 dark:text-gray-100">
       <h2 className="text-2xl font-semibold mb-6">
         Vehicle Service Insights — Last 30 Days
       </h2>
+
+      <InsightsFilterBar
+        filters={filters}
+        onChange={setFilters}
+        advisors={advisorList}
+      />
 
       {/* Table */}
       <div
@@ -107,30 +153,30 @@ function VehicleInsights() {
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium
                 ${
-                  v.status === "In Service"
+                  v.currentStatus === "In Service"
                     ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                    : v.status === "Ready"
+                    : v.currentStatus === "Ready"
                       ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                       : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
                 }`}
                     >
-                      {v.status}
+                      {v.currentStatus}
                     </span>
                   </td>
 
                   {/* Idle Time */}
                   <td className="px-6 py-4 font-medium">
-                    {v.idleTime ? (
+                    {v.idleHours ? (
                       <span
                         className={
-                          parseFloat(v.idleTime) > 72
+                          parseFloat(v.idleHours) > 72
                             ? "text-red-500 font-semibold"
-                            : parseFloat(v.idleTime) > 48
+                            : parseFloat(v.idleHours) > 48
                               ? "text-amber-500"
                               : "text-gray-700 dark:text-gray-300"
                         }
                       >
-                        {v.idleTime}
+                        {v.idleHours}
                       </span>
                     ) : (
                       "-"
