@@ -13,6 +13,7 @@ const {requestRework,startRework,sendReworkToQC,completeRework,} = require("../c
 const { updatePaymentStatus } = require("../controllers/vehicleController");
 const { getVehicles } = require("../controllers/vehicleController");
 const { getVehiclesByStatus } = require("../controllers/vehicleController");
+const { getVehicleInsights } = require("../controllers/vehicleController");
 
 router.post(
   "/checkin",
@@ -131,4 +132,11 @@ router.get(
   getVehicles
 );
 
+//filter for admin only
+router.get(
+  "/vehicle-insights",
+  protect,
+  authorizeRoles("ADMIN"),
+  getVehicleInsights
+);
 module.exports = router;

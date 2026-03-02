@@ -1,4 +1,5 @@
 const VehicleEntry = require("../models/VehicleEntry");
+const Vehicle = require("../models/VehicleEntry");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const { calculateTimes } = require("../utils/timeCalculator");
@@ -413,7 +414,7 @@ exports.deliver = async (req, res) => {
 };
 
 // GET /vehicles
-// Advisor + Admin — filterable
+// Advisor — filterable
 exports.getVehicles = async (req, res) => {
   try {
     const user = req.user;
@@ -510,6 +511,118 @@ exports.getVehicles = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server error while fetching vehicles",
+    });
+  }
+};
+
+// controllers/adminInsightsController.js
+exports.getVehicleInsights = async (req, res) => {
+  try {
+    const {
+      status,
+      serviceType,
+      paymentStatus,
+      priority,
+      advisor,
+      fuelType,
+      brand,
+      model,
+      insurance,
+      fromDate,
+      toDate,
+      search,
+      idleGt,
+      idleLt,
+      page = 1,
+      limit = 20,
+      sortBy = "checkInTime",
+      order = "desc",
+    } = req.query;
+
+    const filters = {};
+
+    /* ---------------- BASIC FILTERS ---------------- */
+
+    if (status) filters.currentStatus = status;
+    if (serviceType) filters.serviceType = serviceType;
+    if (paymentStatus) filters.paymentStatus = paymentStatus;
+    if (priority) filters.priority = priority;
+    if (advisor) filters.assignedAdvisor = advisor;
+    if (fuelType) filters.fuelType = fuelType;
+    if (brand) filters.vehicleBrand = brand;
+    if (model) filters.vehicleModel = model;
+
+    if (insurance !== undefined)
+      filters.isInsuranceJob = insurance === "true";
+
+    /* ---------------- DATE RANGE ---------------- */
+
+    if (fromDate || toDate) {
+      filters.checkInTime = {};
+
+      if (fromDate) filters.checkInTime.$gte = new Date(fromDate);
+      if (toDate) filters.checkInTime.$lte = new Date(toDate);
+    }
+
+    /* ---------------- SEARCH ---------------- */
+
+    if (search) {
+      filters.$or = [
+        { vehicleNumber: { $regex: search, $options: "i" } },
+        { customerName: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    /* ---------------- QUERY DB ---------------- */
+
+    let vehicles = await Vehicle.find(filters)
+      .populate("assignedAdvisor", "name email")
+      .sort({ [sortBy]: order === "asc" ? 1 : -1 })
+      .lean();
+
+    /* ---------------- IDLE TIME FILTER ---------------- */
+
+    const now = new Date();
+
+    vehicles = vehicles.map((v) => {
+      const idleHours =
+        (now - new Date(v.checkInTime)) / (1000 * 60 * 60);
+
+      return {
+        ...v,
+        idleHours: Number(idleHours.toFixed(1)),
+        jobCount: v.jobs?.length || 0,
+      };
+    });
+
+    if (idleGt)
+      vehicles = vehicles.filter((v) => v.idleHours > Number(idleGt));
+
+    if (idleLt)
+      vehicles = vehicles.filter((v) => v.idleHours < Number(idleLt));
+
+    /* ---------------- PAGINATION ---------------- */
+
+    const total = vehicles.length;
+    const start = (page - 1) * limit;
+    const paginated = vehicles.slice(start, start + Number(limit));
+
+    /* ---------------- RESPONSE ---------------- */
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      count: paginated.length,
+      data: paginated,
+    });
+  } catch (err) {
+    console.error("Vehicle Insights Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch vehicle insights",
     });
   }
 };
