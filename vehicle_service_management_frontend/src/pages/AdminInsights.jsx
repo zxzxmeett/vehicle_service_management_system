@@ -174,15 +174,15 @@ function VehicleInsights() {
             {/* ─── CHANGE 3: Added Payment and Priority columns to header ─── */}
             <thead className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-4 text-left font-semibold">Vehicle</th>
-                <th className="px-6 py-4 text-left font-semibold">Customer</th>
-                <th className="px-6 py-4 text-left font-semibold">Service</th>
-                <th className="px-6 py-4 text-left font-semibold">Status</th>
-                <th className="px-6 py-4 text-left font-semibold">Payment</th>
-                <th className="px-6 py-4 text-left font-semibold">Priority</th>
-                <th className="px-6 py-4 text-left font-semibold">Idle</th>
-                <th className="px-6 py-4 text-left font-semibold">Jobs</th>
-                <th className="px-6 py-4 text-left font-semibold">Details</th>
+                <th className="px-4 py-4 text-left font-semibold">Vehicle</th>
+                <th className="px-4 py-4 text-left font-semibold">Customer</th>
+                <th className="px-4 py-4 text-left font-semibold">Service</th>
+                <th className="px-4 py-4 text-left font-semibold">Status</th>
+                <th className="px-4 py-4 text-left font-semibold">Payment</th>
+                <th className="px-4 py-4 text-left font-semibold">Priority</th>
+                <th className="px-4 py-4 text-left font-semibold">Idle</th>
+                <th className="px-4 py-4 text-left font-semibold">Jobs</th>
+                <th className="px-4 py-4 text-left font-semibold">Details</th>
               </tr>
             </thead>
 
@@ -255,7 +255,7 @@ function VehicleInsights() {
                       )}
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <button
                         onClick={() => openJobs(v)}
                         className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow transition"
@@ -267,7 +267,7 @@ function VehicleInsights() {
                       </button>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <button
                         onClick={() => toggleRow(v._id)}
                         className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-xs font-medium"
