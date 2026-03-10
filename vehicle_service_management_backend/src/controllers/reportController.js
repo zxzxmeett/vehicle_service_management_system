@@ -140,7 +140,7 @@ exports.getVehicleInsights = async (req, res) => {
       createdAt: { $gte: startDate, $lte: endDate },
     })
       .select(
-        "vehicleNumber customerName serviceType status idleTime jobs createdAt deliveryDate paymentStatus",
+        "vehicleNumber customerName serviceType currentStatus paymentStatus priority idleTime jobs createdAt checkInTime deliveryTime statusHistory isInsuranceJob reworkCount lastReworkAt estimatedCost",
       )
       .sort({ createdAt: -1 });
 
@@ -167,6 +167,14 @@ exports.getVehicleInsights = async (req, res) => {
         inDate: v.createdAt,
         deliveryDate: v.deliveryDate,
         paymentStatus: v.paymentStatus,
+        checkInTime: v.checkInTime,
+        deliveryTime: v.deliveryTime,
+        statusHistory: v.statusHistory,
+        isInsuranceJob: v.isInsuranceJob,
+        reworkCount: v.reworkCount,
+        lastReworkAt: v.lastReworkAt,
+        priority: v.priority,
+        estimatedCost: v.estimatedCost,
       };
     });
 
