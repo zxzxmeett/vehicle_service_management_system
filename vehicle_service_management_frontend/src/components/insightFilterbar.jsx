@@ -30,17 +30,17 @@ export default function InsightsFilterBar({
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg
                     border border-gray-200 dark:border-gray-700
-                    p-4 mb-6 space-y-4">
+                    p-3 mb-4 space-y-3">
 
-      {/* 🔝 QUICK FILTERS */}
-      <div className="flex flex-wrap items-center gap-3">
+      {/* QUICK FILTERS */}
+      <div className="flex flex-wrap items-center gap-2">
 
-        {/* ⭐ DATE RANGE GROUP */}
+        {/* DATE RANGE GROUP */}
         <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800
-                        px-3 py-2 rounded-lg border
+                        px-2 py-1.5 rounded-lg border
                         border-gray-200 dark:border-gray-700">
 
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+          <span className="text-lg font-medium text-gray-600 dark:text-gray-300">
             Date:
           </span>
 
@@ -146,7 +146,7 @@ export default function InsightsFilterBar({
         </button>
       </div>
 
-      {/* 🔽 ADVANCED FILTERS */}
+      {/* ADVANCED FILTERS */}
       {showAdvanced && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4
                         pt-4 border-t border-gray-200 dark:border-gray-700">
