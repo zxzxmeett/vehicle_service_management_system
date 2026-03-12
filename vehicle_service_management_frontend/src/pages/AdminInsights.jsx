@@ -172,7 +172,7 @@ function VehicleInsights() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             {/* ─── CHANGE 3: Added Payment and Priority columns to header ─── */}
-            <thead className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 sticky top-0 z-10">
+            <thead className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 sticky top-0 z-10 text-xs">
               <tr>
                 <th className="px-4 py-4 text-left font-semibold">Vehicle</th>
                 <th className="px-4 py-4 text-left font-semibold">Customer</th>
@@ -193,13 +193,13 @@ function VehicleInsights() {
                 <React.Fragment key={v._id}>
                   {/* ── Main row ── */}
                   <tr className="border-t border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition">
-                    <td className="px-6 py-4 font-mono font-semibold tracking-wide">
+                    <td className="px-4 py-3 font-mono font-semibold tracking-wide">
                       {v.vehicleNumber}
                     </td>
 
-                    <td className="px-6 py-4">{v.customerName}</td>
+                    <td className="px-4 py-3">{v.customerName}</td>
 
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           v.serviceType === "ACCIDENT"
@@ -213,7 +213,7 @@ function VehicleInsights() {
                       </span>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           v.currentStatus === "IN_SERVICE"
@@ -228,16 +228,16 @@ function VehicleInsights() {
                     </td>
 
                     {/* ─── CHANGE 4: paymentStatus now in main row ─── */}
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <PaymentBadge status={v.paymentStatus} />
                     </td>
 
                     {/* ─── CHANGE 5: priority now in main row ─── */}
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <PriorityBadge priority={v.priority} />
                     </td>
 
-                    <td className="px-6 py-4 font-medium">
+                    <td className="px-4 py-3 font-medium">
                       {v.idleHours ? (
                         <span
                           className={
@@ -390,7 +390,7 @@ function VehicleInsights() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="w-full max-w-2xl bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
               <div>
                 <h3 className="text-xl font-semibold">Job Cards</h3>
                 <p className="text-sm text-gray-500">
@@ -443,7 +443,7 @@ function VehicleInsights() {
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+            <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
               <button
                 onClick={() => setShowModal(false)}
                 className="w-full py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium"
