@@ -150,7 +150,7 @@ exports.addJob = asyncHandler(async (req, res) => {
 });
 
 exports.updateVehicleDetails = asyncHandler(async (req, res) => {
-  console.log("BODY:", req.body);
+  //console.log("BODY:", req.body);
   const vehicle = await VehicleEntry.findById(req.params.id);
 
   if (!vehicle) {
@@ -227,8 +227,8 @@ exports.getAssignedVehicles = async (req, res) => {
 exports.getVehicleJobs = async (req, res) => {
   const vehicle = await VehicleEntry.findById(req.params.id).select("jobs");
 
-  console.log("Vehicle:", vehicle);
-  console.log("Jobs:", vehicle?.jobs);
+  //console.log("Vehicle:", vehicle);
+  //console.log("Jobs:", vehicle?.jobs);
 
   if (!vehicle) {
     return res.status(404).json({ message: "Vehicle not found" });
@@ -347,7 +347,7 @@ exports.completeRework = asyncHandler(async (req, res) => {
 
 // controllers/vehicleController.js
 exports.updatePaymentStatus = asyncHandler(async (req, res) => {
-  console.log(req.user.role);
+  //console.log(req.user.role);
   const vehicle = await VehicleEntry.findById(req.params.id);
 
   if (!vehicle) {
