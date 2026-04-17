@@ -602,7 +602,7 @@ function Advisor() {
 
                           {job.file && (
                             <a
-                              href={`http://localhost:5000/${job.file}`}
+                              href={job.file}
                               target="_blank"
                               rel="noreferrer"
                               className="text-blue-600 dark:text-blue-400 text-xs underline"
@@ -661,7 +661,7 @@ function Advisor() {
                     >
                       <input
                         type="file"
-                        name="file"
+                        name="jobFile"
                         accept="image/*,.pdf"
                         onChange={(e) => handleJobChange(vehicle._id, e)}
                         className="hidden"

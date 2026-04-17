@@ -1,16 +1,16 @@
+require("../config/cloudinary"); // Ensure cloudinary is configured
 const multer = require("multer");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-//stores uploaded files in 'uploads' directory with unique filenames
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename(req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "job_cards",
+    resource_type: "auto", // allows pdf, images, etc.
   },
 });
 
 const upload = multer({ storage });
 
-module.exports = upload; 
+module.exports = upload;
