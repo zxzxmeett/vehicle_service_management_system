@@ -428,7 +428,7 @@ function VehicleInsights() {
                       </div>
                       {job.file && (
                         <a
-                          href={`http://localhost:5000/${job.file}`}
+                          href={`${job.file}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-shrink-0 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-900 transition"

@@ -65,6 +65,8 @@ function Advisor() {
       setVehicles(res.data.data); // matches your controller
     } catch (err) {
       setError("Failed to fetch vehicles");
+      console.log(err);
+      
     }
   };
 
@@ -136,12 +138,15 @@ function Advisor() {
   };
 
   const handleJobChange = (vehicleId, e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
+
+    const file = e.target.files && e.target.files[0];
+
     setJobData((prev) => ({
       ...prev,
       [vehicleId]: {
         ...prev[vehicleId],
-        [name]: files ? files[0] : value,
+        [name]: file ? file : value,
       },
     }));
   };
@@ -162,30 +167,43 @@ function Advisor() {
       const file = e.dataTransfer.files[0];
       setJobData((prev) => ({
         ...prev,
-        [vehicleId]: { ...prev[vehicleId], file }, // Consistent key 'file'
+        [vehicleId]: {
+          ...prev[vehicleId],
+          jobFile: file,
+        },
       }));
     }
   };
 
   const addJob = async (vehicleId) => {
     const data = jobData[vehicleId];
+
     if (!data?.description) {
       setError("Job description required");
       return;
     }
 
     const formData = new FormData();
+
     formData.append("description", data.description);
     formData.append("estimatedTimeInMinutes", data.estimatedTimeInMinutes || 0);
-    if (data.file) formData.append("jobFile", data.file); // Matches backend 'jobFile'
+
+    if (data.jobFile) {
+      formData.append("jobFile", data.jobFile);
+    }
 
     try {
-      await api.post(`/vehicles/${vehicleId}/jobs`, formData);
+      await api.post(`/vehicles/${vehicleId}/jobs`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       setMessage("Job added successfully");
       setError("");
       setJobData((prev) => ({ ...prev, [vehicleId]: {} }));
       fetchVehicles();
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Failed to add job");
     }
   };
@@ -681,10 +699,8 @@ function Advisor() {
                         </span>
                       </label>
 
-                      {jobData[vehicle._id]?.file && (
-                        <p className="mt-2 text-xs text-green-600 font-medium">
-                          Selected: {jobData[vehicle._id].file.name}
-                        </p>
+                      {jobData[vehicle._id]?.jobFile && (
+                        <p>Selected: {jobData[vehicle._id].jobFile.name}</p>
                       )}
                     </div>
                   </div>
