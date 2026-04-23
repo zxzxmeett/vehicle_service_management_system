@@ -1,6 +1,8 @@
 #  **Vehicle Service Management System (VSMS)**
 
 Live: https://vehicle-service-management-system-drab.vercel.app/
+**A MERN stack web application** built to digitize and streamline operations of a vehicle service center.  
+The system manages the **complete lifecycle of a vehicle — from entry to delivery — using role-based workflows.**
 
 ##  **Demo Credentials**
 
@@ -24,9 +26,6 @@ Use the following accounts to explore different roles:
 - **Email:** advisor1@test.com  
 - **Email:** advisor2@test.com  
 - **Password:** 123456  
-
-**A MERN stack web application** built to digitize and streamline operations of a vehicle service center.  
-The system manages the **complete lifecycle of a vehicle — from entry to delivery — using role-based workflows.**
 
 ---
 
