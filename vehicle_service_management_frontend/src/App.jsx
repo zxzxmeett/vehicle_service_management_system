@@ -11,6 +11,8 @@ import ReceptionDelivery from "./pages/ReceptionDelivery.jsx";
 import AdminLayout from "./pages/AdminLayout.jsx";
 import VehicleInsights from "./pages/AdminInsights.jsx";
 import ManageUsers from "./pages/ManageUser.jsx";
+import { ToastContainer } from "react-toastify";    
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   //console.log("API URL:", import.meta.env.VITE_API_URL);
@@ -33,6 +35,7 @@ function App() {
         <Route path="/reception/delivery" allowedRoles={["RECEPTIONIST"]} element={<ReceptionDelivery />} />
         <Route path="/advisor" element={<ProtectedRoute allowedRoles={["ADVISOR"]}><Advisor /></ProtectedRoute>} />
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
   );
 }

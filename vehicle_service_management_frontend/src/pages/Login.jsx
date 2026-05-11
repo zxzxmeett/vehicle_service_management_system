@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import ThemeToggle from "../components/ThemeToggle";
+import { toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -15,29 +16,44 @@ function Login() {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  
+  // 1. Create the promise (don't await it yet)
+  const loginPromise = api.post("/auth/login", { email, password });
 
-    try {
-      const res = await api.post("/auth/login", { email, password });
-
-      const token = res.data.token;
-      const role = res.data.role;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
-
-      if (role === "ADMIN") navigate("/admin", { replace: true });
-      else if (role === "SECURITY") navigate("/security", { replace: true });
-      else if (role === "RECEPTIONIST")
-        navigate("/reception", { replace: true });
-      else if (role === "ADVISOR") navigate("/advisor", { replace: true });
-      else console.error("Unknown role:", role);
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+  // 2. Wrap the promise in a toast
+  toast.promise(loginPromise, {
+    pending: 'Checking credentials...',
+    success: 'Login successful! Redirecting...',
+    error: {
+      render({ data }) {
+        // This dynamically catches the error message from your API
+        return data.response?.data?.message || "Invalid email or password";
+      }
     }
-  };
+  });
 
+  try {
+    // 3. Now await the response to handle navigation
+    const res = await loginPromise;
+    const { token, role } = res.data;
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", role);
+
+    // Short delay so they can actually see the "Success" toast before navigating
+    setTimeout(() => {
+      if (role === "ADMIN") navigate("/admin");
+      else if (role === "SECURITY") navigate("/security");
+      else if (role === "RECEPTIONIST") navigate("/reception");
+      else if (role === "ADVISOR") navigate("/advisor");
+    }, 1000);
+
+  } catch (err) {
+    // Error is already handled by toast.promise!
+    console.error("Login Error:", err);
+  }
+};
   return (
     <div className="min-h-screen bg-slate-200 dark:bg-[#0a0f1c] flex items-center justify-center px-6 transition-colors duration-300">
       {/* Floating Toggle for Login Page */}
