@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import LogoutButton from "../components/LogoutButton";
 import ThemeToggle from "../components/ThemeToggle";
+import { toast } from "react-toastify";
 
 function CreateUser() {
   const navigate = useNavigate();
@@ -29,7 +30,11 @@ function CreateUser() {
 
     try {
       await api.post("/users", userData);
-      setMessage("User created successfully");
+      
+      toast.success("User created successfully", {
+      autoClose: 2000,
+      theme: "colored",
+    });
 
       setUserData({ name: "", email: "", password: "", role: "" });
 

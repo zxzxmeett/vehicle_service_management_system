@@ -3,6 +3,7 @@ import api from "../services/api";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ResponsiveContainer } from "recharts";
+import { toast } from "react-toastify";
 // Dasboard for admin
 
 function Admin() {
@@ -57,7 +58,19 @@ function Admin() {
     fetchSummary();
   }, []);
 
-  if (!summary) return <p>Loading analytics...</p>;
+  useEffect(() => {
+  const toastId = "dashboard-loading";
+
+  if (!report && !error && !toast.isActive(toastId)) {
+    toast.info("Loading report...", {
+      toastId,
+      autoClose: 2000,
+      theme: "colored",
+    });
+  }
+}, [report, error]);
+
+  if (!summary) return null;
 
   const statusData = summary.statusCounts.map((item) => ({
     name: item._id,
@@ -105,11 +118,6 @@ function Admin() {
           <div className="mb-6 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-400">
             {error}
           </div>
-        )}
-        {!report && !error && (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Loading report…
-          </p>
         )}
 
         {/* Summary Card */}

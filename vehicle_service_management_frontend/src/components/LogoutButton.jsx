@@ -1,10 +1,14 @@
 import { useNavigate } from "react-router-dom";
-
+import {  toast } from "react-toastify";
 function LogoutButton() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    toast.success("Successfully logged out", {
+      autoClose: 2000,
+      theme: "colored",
+    });
     localStorage.removeItem("role");
     navigate("/", { replace: true });
   };
